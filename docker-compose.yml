@@ -1,0 +1,54 @@
+services:
+  oba_database:
+    image: mysql:8.4
+    container_name: oba_database
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: oba_database
+      MYSQL_USER: ${JDBC_USER:-oba}
+      MYSQL_PASSWORD: ${JDBC_PASSWORD:-***REMOVED***}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: always
+
+  oba_bundler:
+    build:
+      context: https://github.com/OneBusAway/onebusaway-docker.git#main:bundler
+    volumes:
+      - ./oba-server/bundle:/bundle
+    environment:
+      - GTFS_URL=${GTFS_URL}
+    depends_on:
+      - oba_database
+
+  oba_app:
+    container_name: oba_app
+    build:
+      context: https://github.com/OneBusAway/onebusaway-docker.git#main:oba
+    environment:
+      - JDBC_URL=${JDBC_URL:-jdbc:mysql://oba_database:3306/oba_database}
+      - JDBC_DRIVER=com.mysql.cj.jdbc.Driver
+      - JDBC_USER=${JDBC_USER:-oba}
+      - JDBC_PASSWORD=${JDBC_PASSWORD:-***REMOVED***}
+      - TEST_API_KEY=${OBA_API_KEY}
+    volumes:
+      - ./oba-server/bundle:/bundle
+    ports:
+      - "8080:8080"
+    depends_on:
+      - oba_database
+    restart: always
+
+  cli:
+    build:
+      context: ./departure-board
+      dockerfile: Dockerfile
+    environment:
+      - OBA_BASE_URL=http://oba_app:8080
+    depends_on:
+      - oba_app
+    profiles:
+      - cli
+
+volumes:
+  mysql-data:

@@ -1,0 +1,95 @@
+{
+  "data": {
+    "entry": {
+      "timeZone": "America/Los_Angeles",
+      "stopCalendarDays": [
+        { "date": 1781161200000 },
+        { "date": 1781074800000 },
+        { "date": 1780988400000 }
+      ],
+      "stopRouteSchedules": [
+        {
+          "routeId": "1_40",
+          "stopRouteDirectionSchedules": [
+            {
+              "tripHeadsign": "Loyal Heights Greenwood",
+              "scheduleStopTimes": [
+                {
+                  "departureTime": 1781183520000,
+                  "departureEnabled": true,
+                  "stopHeadsign": ""
+                },
+                {
+                  "departureTime": 1781185500000,
+                  "departureEnabled": true,
+                  "stopHeadsign": "Crown Hill"
+                },
+                {
+                  "departureTime": 1781187000000,
+                  "departureEnabled": false,
+                  "stopHeadsign": ""
+                }
+              ]
+            },
+            {
+              "tripHeadsign": "Downtown Seattle",
+              "scheduleStopTimes": [
+                {
+                  "departureTime": 1781183880000,
+                  "departureEnabled": true,
+                  "stopHeadsign": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "routeId": "1_E",
+          "stopRouteDirectionSchedules": [
+            {
+              "tripHeadsign": "Aurora Village",
+              "scheduleStopTimes": [
+                {
+                  "departureTime": 1781184120000,
+                  "departureEnabled": true,
+                  "stopHeadsign": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "routeId": "1_NOROUTESHORTNAME",
+          "stopRouteDirectionSchedules": [
+            {
+              "tripHeadsign": "Some Place",
+              "scheduleStopTimes": [
+                {
+                  "departureTime": 1781184120000,
+                  "departureEnabled": true,
+                  "stopHeadsign": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "references": {
+      "routes": [
+        {
+          "id": "1_40",
+          "shortName": "40"
+        },
+        {
+          "id": "1_E",
+          "shortName": "E Line"
+        },
+        {
+          "id": "1_NOROUTESHORTNAME",
+          "shortName": null
+        }
+      ]
+    }
+  }
+}
