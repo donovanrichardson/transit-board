@@ -1,3 +1,4 @@
 .env
 oba-server/bundle/
 departure-board/target/
+logs/monitor.jsonl

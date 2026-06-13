@@ -50,5 +50,15 @@ services:
     profiles:
       - cli
 
+  monitor:
+    build: ./monitor
+    volumes:
+      - /proc:/host/proc:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./logs:/logs
+    environment:
+      - MONITOR_INTERVAL_SECONDS=60
+    restart: unless-stopped
+
 volumes:
   mysql-data:
