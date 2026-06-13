@@ -112,13 +112,13 @@ class ScheduleParserTest {
     }
 
     @Test
-    void noCalendarDaysThrows() {
+    void noCalendarDaysReturnEmpty() {
         ObaResponse emptyResponse = new ObaResponse();
         emptyResponse.data = new ObaResponse.DataWrapper();
         emptyResponse.data.entry = new ObaResponse.Entry();
         emptyResponse.data.entry.stopCalendarDays = List.of();
 
-        assertThrows(ScheduleParser.NoServiceException.class,
-                () -> parser.findDateToUse(emptyResponse, LA, TODAY));
+        Optional<LocalDate> result = parser.findDateToUse(emptyResponse, LA, TODAY);
+        assertTrue(result.isEmpty(), "No calendar days → use current response (Optional.empty)");
     }
 }

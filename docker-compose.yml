@@ -23,6 +23,7 @@ services:
 
   oba_app:
     container_name: oba_app
+    hostname: oba-app
     build:
       context: https://github.com/OneBusAway/onebusaway-docker.git#main:oba
     environment:
@@ -44,7 +45,7 @@ services:
       context: ./departure-board
       dockerfile: Dockerfile
     environment:
-      - OBA_BASE_URL=http://oba_app:8080
+      - OBA_BASE_URL=http://oba-app:8080
     depends_on:
       - oba_app
     profiles:

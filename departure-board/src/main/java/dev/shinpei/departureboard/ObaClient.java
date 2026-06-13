@@ -32,7 +32,8 @@ public class ObaClient {
     }
 
     public ObaResponse fetchSchedule(String stopId, LocalDate date) {
-        String url = baseUrl + "/api/where/schedule-for-stop/" + stopId + ".json"
+        String encodedStopId = stopId.replace(" ", "%20");
+        String url = baseUrl + "/api/where/schedule-for-stop/" + encodedStopId + ".json"
                 + "?key=" + API_KEY + "&date=" + DATE_FMT.format(date);
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -58,7 +59,11 @@ public class ObaClient {
         }
 
         try {
-            return objectMapper.readValue(response.body(), ObaResponse.class);
+            ObaResponse parsed = objectMapper.readValue(response.body(), ObaResponse.class);
+            if (parsed == null) {
+                throw new ObaClientException("OBA server returned no data — bundle may not be loaded yet", 3);
+            }
+            return parsed;
         } catch (IOException e) {
             throw new ObaClientException("Failed to parse OBA response: " + e.getMessage(), 3);
         }

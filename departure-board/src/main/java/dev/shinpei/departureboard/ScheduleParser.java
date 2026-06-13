@@ -29,7 +29,7 @@ public class ScheduleParser {
                 response.data.entry.stopCalendarDays;
 
         if (calendarDays == null || calendarDays.isEmpty()) {
-            throw new NoServiceException("No scheduled service");
+            return Optional.empty();
         }
 
         List<LocalDate> dates = new ArrayList<>();
