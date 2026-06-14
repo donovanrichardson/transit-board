@@ -1,4 +1,7 @@
 .env
 oba-server/bundle/
 departure-board/target/
+transit-board-api/target/
 logs/monitor.jsonl
+frontend/node_modules/
+frontend/dist/
