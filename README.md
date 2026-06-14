@@ -27,7 +27,6 @@ E Line  Aurora Village                  06:22
 **Not yet supported:**
 - Multiple stops in one query
 - Real-time arrivals (static schedule only)
-- Web UI
 
 ---
 
@@ -38,11 +37,20 @@ transit-board/
 ├── docker-compose.yml       — all services
 ├── .env                     — secrets and config (gitignored)
 ├── .env.example             — template
+├── board                    — shell wrapper: runs CLI via docker compose
 ├── oba-server/
 │   └── bundle/              — built by oba_bundler at runtime
-└── departure-board/
+├── departure-board/         — CLI tool (Java/Maven)
+│   ├── Dockerfile
+│   ├── pom.xml
+│   └── src/
+├── transit-board-api/       — REST API for the web frontend (Java/Maven, port 4000)
+│   ├── Dockerfile
+│   ├── pom.xml
+│   └── src/
+└── frontend/                — Svelte timetable web app (served on port 5173)
     ├── Dockerfile
-    ├── pom.xml
+    ├── nginx.conf
     └── src/
 ```
 
@@ -82,24 +90,53 @@ docker compose up oba_bundler
 
 Wait for the bundler to exit cleanly before proceeding. The bundle is written to `oba-server/bundle/` and persists between server restarts. Re-run this step whenever your agency publishes a new GTFS feed.
 
-### 4. Start the OBA server
+### 4. Start the services
 
+**CLI only** (departure board):
 ```bash
 docker compose up oba_app
 ```
 
-The API is live at `http://localhost:8080` once startup completes. Verify with:
+**Web timetable** (frontend + API + OBA):
+```bash
+docker compose up oba_app transit-board-api frontend
+```
 
+Verify OBA is ready:
 ```bash
 curl "http://localhost:8080/api/where/current-time.json?key=TEST"
 # Expect: {"code":200,...}
 ```
 
+OBA loads the full transit bundle into memory at startup. Wait until the `oba_app` logs show Tomcat started before the frontend will return real data.
+
 ---
 
-## Usage
+## Timetable web app
 
-Find your stop ID from the `stops.txt` file in your GTFS zip, or browse `http://localhost:8080` once the server is running.
+Open your browser to:
+
+```
+http://localhost:5173/stop/<stopId>
+```
+
+Replace `<stopId>` with a full OBA stop ID (agency-prefixed), e.g.:
+
+```
+http://localhost:5173/stop/MTA%20NYCT_725S
+```
+
+The timetable shows a Japanese-style hour/minute grid for the stop's full day schedule. Use the date picker to view past or future dates. Use the headsign filter (shown when the stop has no direction in the GTFS data) to filter by destination.
+
+To navigate between platforms at a station (e.g. northbound ↔ southbound), use the direction toggle in the header — it appears automatically when the stop has a sibling platform.
+
+**Architecture:** the frontend (`http://localhost:5173`) is served by Nginx, which proxies `/api/*` requests to `transit-board-api` (port 4000 internal). `transit-board-api` talks to `oba_app` over the Docker network. You never need to call port 4000 directly.
+
+---
+
+## Usage (CLI)
+
+Find your stop ID from the `stops.txt` file in your GTFS zip, or browse `http://localhost:8080` once the OBA server is running.
 
 ```bash
 # Basic usage
@@ -148,4 +185,5 @@ GTFS feeds expire on a schedule set by each agency (weekly, monthly, or ad hoc).
 | `JDBC_URL` | `jdbc:mysql://oba_database:3306/oba_database` | Database connection string |
 | `JDBC_USER` | `oba` | Database user |
 | `JDBC_PASSWORD` | `***REMOVED***` | Database password |
-| `OBA_BASE_URL` | `http://localhost:8080` | OBA server URL (CLI env var) |
+| `OBA_BASE_URL` | `http://localhost:8080` | OBA server URL (used by CLI and transit-board-api) |
+| `PORT` | `4000` | Port transit-board-api listens on (internal Docker network only) |
