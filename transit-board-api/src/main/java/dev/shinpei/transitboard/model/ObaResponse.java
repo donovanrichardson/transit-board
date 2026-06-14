@@ -1,4 +1,4 @@
-package dev.shinpei.departureboard.model;
+package dev.shinpei.transitboard.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;

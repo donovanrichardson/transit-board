@@ -31,6 +31,43 @@ public class ObaClient {
         this.objectMapper = new ObjectMapper();
     }
 
+    public ObaResponse fetchStop(String stopId) {
+        String encodedStopId = stopId.replace(" ", "%20");
+        String url = baseUrl + "/api/where/stop/" + encodedStopId + ".json?key=" + API_KEY;
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .timeout(Duration.ofSeconds(30))
+                .GET()
+                .build();
+
+        HttpResponse<String> response;
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (ConnectException e) {
+            throw new ObaClientException("Cannot connect to OBA server at " + baseUrl + ": " + e.getMessage(), 3);
+        } catch (IOException e) {
+            throw new ObaClientException("Cannot connect to OBA server at " + baseUrl + ": " + e.getMessage(), 3);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ObaClientException("Cannot connect to OBA server at " + baseUrl + ": interrupted", 3);
+        }
+
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new ObaClientException("OBA API error: HTTP " + response.statusCode(), 3);
+        }
+
+        try {
+            ObaResponse parsed = objectMapper.readValue(response.body(), ObaResponse.class);
+            if (parsed == null) {
+                throw new ObaClientException("OBA server returned no data", 3);
+            }
+            return parsed;
+        } catch (IOException e) {
+            throw new ObaClientException("Failed to parse OBA response: " + e.getMessage(), 3);
+        }
+    }
+
     public ObaResponse fetchSchedule(String stopId, LocalDate date) {
         String encodedStopId = stopId.replace(" ", "%20");
         String url = baseUrl + "/api/where/schedule-for-stop/" + encodedStopId + ".json"

@@ -1,0 +1,33 @@
+{
+  "data": {
+    "entry": {
+      "id": "MTA_NYCT_725",
+      "name": "Times Sq-42 St",
+      "direction": null,
+      "parent": null
+    },
+    "references": {
+      "routes": [],
+      "stops": [
+        {
+          "id": "MTA_NYCT_725",
+          "name": "Times Sq-42 St",
+          "direction": null,
+          "parent": null
+        },
+        {
+          "id": "MTA_NYCT_725S",
+          "name": "Times Sq-42 St",
+          "direction": "NW",
+          "parent": "MTA_NYCT_725"
+        },
+        {
+          "id": "MTA_NYCT_725N",
+          "name": "Times Sq-42 St",
+          "direction": "SE",
+          "parent": "MTA_NYCT_725"
+        }
+      ]
+    }
+  }
+}

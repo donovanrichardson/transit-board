@@ -1,4 +1,4 @@
-package dev.shinpei.departureboard.model;
+package dev.shinpei.transitboard.model;
 
 import java.time.Instant;
 
@@ -9,10 +9,6 @@ public class Departure {
     private final Instant departureTime;
     private final String routeColor;
     private final String routeTextColor;
-
-    public Departure(String routeShortName, String headsign, Instant departureTime) {
-        this(null, routeShortName, headsign, departureTime, null, null);
-    }
 
     public Departure(String routeId, String routeShortName, String headsign,
                      Instant departureTime, String routeColor, String routeTextColor) {

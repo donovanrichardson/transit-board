@@ -1,0 +1,45 @@
+{
+  "data": {
+    "entry": {
+      "timeZone": "America/New_York",
+      "stopCalendarDays": [
+        { "date": 1718323200000 }
+      ],
+      "stopRouteSchedules": [
+        {
+          "routeId": "MTA_NYCT_7",
+          "stopRouteDirectionSchedules": [
+            {
+              "tripHeadsign": "34 St-Hudson Yards",
+              "scheduleStopTimes": [
+                {
+                  "departureTime": 1718370720000,
+                  "departureEnabled": true,
+                  "stopHeadsign": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "references": {
+      "routes": [
+        {
+          "id": "MTA_NYCT_7",
+          "shortName": "7",
+          "color": "B933AD",
+          "textColor": "FFFFFF"
+        }
+      ],
+      "stops": [
+        {
+          "id": "MTA_NYCT_725S",
+          "name": "Times Sq-42 St",
+          "direction": "NW",
+          "parent": "MTA_NYCT_725"
+        }
+      ]
+    }
+  }
+}

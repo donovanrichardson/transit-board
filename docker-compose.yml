@@ -51,6 +51,27 @@ services:
     profiles:
       - cli
 
+  transit-board-api:
+    build:
+      context: ./transit-board-api
+      dockerfile: Dockerfile
+    environment:
+      - OBA_BASE_URL=http://oba-app:8080
+      - PORT=4000
+    depends_on:
+      - oba_app
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - transit-board-api
+    restart: always
+
   monitor:
     build: ./monitor
     volumes:
