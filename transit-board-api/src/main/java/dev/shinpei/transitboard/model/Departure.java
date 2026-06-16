@@ -9,6 +9,8 @@ public class Departure {
     private final Instant departureTime;
     private final String routeColor;
     private final String routeTextColor;
+    private final String tripId;
+    private String directionId;
 
     public Departure(String routeId, String routeShortName, String headsign,
                      Instant departureTime, String routeColor, String routeTextColor) {
@@ -18,6 +20,21 @@ public class Departure {
         this.departureTime = departureTime;
         this.routeColor = routeColor;
         this.routeTextColor = routeTextColor;
+        this.tripId = null;
+        this.directionId = null;
+    }
+
+    public Departure(String routeId, String routeShortName, String headsign,
+                     Instant departureTime, String routeColor, String routeTextColor,
+                     String tripId) {
+        this.routeId = routeId;
+        this.routeShortName = routeShortName;
+        this.headsign = headsign;
+        this.departureTime = departureTime;
+        this.routeColor = routeColor;
+        this.routeTextColor = routeTextColor;
+        this.tripId = tripId;
+        this.directionId = null;
     }
 
     public String getRouteId() {
@@ -42,5 +59,17 @@ public class Departure {
 
     public String getRouteTextColor() {
         return routeTextColor;
+    }
+
+    public String getTripId() {
+        return tripId;
+    }
+
+    public String getDirectionId() {
+        return directionId;
+    }
+
+    public void setDirectionId(String directionId) {
+        this.directionId = directionId;
     }
 }

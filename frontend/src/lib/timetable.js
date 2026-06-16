@@ -94,3 +94,67 @@ export function computeRouteIconVisibility(departures) {
   }
   return result;
 }
+
+/**
+ * Computes headsign abbreviation visibility for LIRR minute cells.
+ *
+ * Rules (same structure as computeRouteIconVisibility but per headsign):
+ * - Single unique headsign → no abbreviation on any cell (false for all)
+ * - One dominant headsign (>2/3 of departures) → dominant=false, others=true
+ * - No dominant headsign → all=true
+ *
+ * @param {Array} departures - array with `headsign` field
+ * @returns {Object} map of headsign → boolean (true=show abbreviation)
+ */
+export function computeHeadsignAbbreviationVisibility(departures) {
+  const counts = {};
+  for (const dep of departures) {
+    const h = dep.headsign;
+    counts[h] = (counts[h] || 0) + 1;
+  }
+
+  const headsigns = Object.keys(counts);
+  const totalCount = departures.length;
+
+  // Single headsign: no abbreviations
+  if (headsigns.length === 1) {
+    return { [headsigns[0]]: false };
+  }
+
+  // Find max count
+  let maxCount = 0;
+  let dominantHeadsign = null;
+  for (const [h, count] of Object.entries(counts)) {
+    if (count > maxCount) {
+      maxCount = count;
+      dominantHeadsign = h;
+    }
+  }
+
+  // Check if dominant headsign exceeds 2/3
+  if (maxCount > (2 / 3) * totalCount) {
+    const result = {};
+    for (const h of headsigns) {
+      result[h] = h !== dominantHeadsign;
+    }
+    return result;
+  }
+
+  // No dominant: all show abbreviations
+  const result = {};
+  for (const h of headsigns) {
+    result[h] = true;
+  }
+  return result;
+}
+
+/**
+ * Filters departures by directionId.
+ *
+ * @param {Array} departures - array with `directionId` field
+ * @param {string} directionId - '0' for outbound, '1' for inbound
+ * @returns {Array} filtered departures
+ */
+export function filterByDirection(departures, directionId) {
+  return departures.filter((d) => d.directionId === directionId);
+}

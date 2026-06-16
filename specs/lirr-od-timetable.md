@@ -88,8 +88,11 @@ Appears only for LIRR stops (`LI_` prefix). Two sections:
 - Clicking a specific destination deselects direction buttons
 - Clicking the already-active item: no-op
 
-**Direction detection (city terminal list):**
-A departure is **inbound** if its headsign exactly matches one of:
+**Direction detection:**
+A departure is **inbound** if its `directionId` is `"1"`. A departure is **outbound** if its `directionId` is `"0"`. This is the GTFS `direction_id` field, exposed per departure in the schedule API response (see backend changes). Do not use the headsign to infer direction — inbound trains can terminate at intermediate stops (e.g. Port Jefferson → Huntington has `direction_id=1` but "Huntington" is not a city terminal).
+
+**City terminal list (used for icon color only — not for direction):**
+The following headsigns indicate a train going all the way to a Manhattan/Brooklyn terminus. These departures render with a **gray** icon regardless of route color:
 - `Penn Station`
 - `Grand Central`
 - `Atlantic Terminal`
@@ -100,7 +103,7 @@ A departure is **inbound** if its headsign exactly matches one of:
 
 > Note: verify these strings match actual OBA LIRR headsign values at implementation time and adjust if needed.
 
-A departure is **outbound** if its headsign does NOT match any city terminal.
+Non-city-terminal inbound trains (e.g. headsign "Huntington") are still correctly classified as inbound via `directionId`, but their icon renders in route color (not gray).
 
 ---
 
@@ -111,8 +114,8 @@ Client-side only — no re-fetch on filter change.
 | Selection | Filter |
 |---|---|
 | Specific destination | `departures.filter(d => d.headsign === selected)` |
-| All Inbound | `departures.filter(d => CITY_TERMINALS.includes(d.headsign))` |
-| All Outbound | `departures.filter(d => !CITY_TERMINALS.includes(d.headsign))` |
+| All Inbound | `departures.filter(d => d.directionId === '1')` |
+| All Outbound | `departures.filter(d => d.directionId === '0')` |
 
 ---
 
@@ -120,7 +123,30 @@ Client-side only — no re-fetch on filter change.
 
 For LIRR stops, each minute cell shows a **headsign abbreviation** in the bottom-right corner instead of the subway route icon.
 
-**Abbreviation source:** The API response includes a `headsignAbbreviations` map (keyed by headsign string, value is the GTFS `stop_code`). Examples: `{"Penn Station": "PEN", "Montauk": "MTK", "Jamaica": "JAM"}`.
+**Abbreviation source:** A hardcoded map keyed by headsign string. Values are the GTFS `stop_code` from `stops.txt`, with two manual overrides. `(Bus)` suffix headsigns share the same abbreviation as their base station.
+
+| Headsign | Abbr | Headsign | Abbr |
+|---|---|---|---|
+| Amagansett | AGT | Montauk | MTK |
+| Atlantic Terminal | ATL | Oyster Bay | OBY |
+| Babylon | BAB | Patchogue | PGE |
+| Far Rockaway | FRY | Penn Station | NYP |
+| Floral Park | FPK | Port Jefferson | PJN |
+| Freeport | FPT | Port Washington | PWS |
+| Grand Central | GCT | Riverhead | RHD |
+| Great Neck | GNK | Ronkonkoma | RON |
+| Greenport | GPT | Seaford | SFD |
+| Hampton Bays | HBY | Shinnecock Hills | SHC |
+| Hempstead | HEM | Smithtown | STN |
+| Hicksville | HVL | Southampton | SHN |
+| Hunterspoint Avenue | HPA | Speonk | SPK |
+| Huntington | HUN | Wantagh | WGH |
+| Jamaica | JAM | West Hempstead | WHD |
+| Long Beach | LBH | | |
+| Long Island City | LIC | | |
+| Massapequa | MQA | | |
+
+Manual overrides from GTFS `stop_code`: Penn Station (NYK → **NYP**), Babylon (BTA → **BAB**).
 
 **Visibility rule** (same dominance logic as subway route icon visibility, applied per headsign):
 1. Count departures per headsign among currently filtered departures.
@@ -128,15 +154,37 @@ For LIRR stops, each minute cell shows a **headsign abbreviation** in the bottom
 3. One headsign accounts for >2/3 of filtered departures → show abbreviation only on minority-headsign cells; dominant headsign cells show nothing.
 4. No headsign exceeds 2/3 → show abbreviation on all cells.
 
-**Color rule:**
-- Headsign is a city terminal → gray text (`#999999`)
-- Headsign is NOT a city terminal → `routeColor` from GTFS (e.g. `#00985F` for Babylon Branch). Fallback to `#999999` if routeColor is null/empty.
+**Color rule (abbreviation text color):**
+Each cell's abbreviation color is determined by the departure's `routeColor` from GTFS. All LIRR routes have a color — there is no missing-color case. The city terminal list is NOT used for individual cell coloring; it is used only for `baseColor` (row background) logic described below.
 
 **Rendering:** Plain text (not a circle icon). Font: ~0.45rem, bold. Position: bottom-right of cell.
 
 **Cell width:**
 - Subway mode: 40px min-width (unchanged)
 - LIRR mode: 46px min-width to accommodate 3-letter abbreviation alongside minute number
+
+---
+
+### Timetable row background color (LIRR mode)
+
+Row tinting uses the existing `computeRowColor` function unchanged (even hours = white; odd hours = `rgba(r,g,b,0.12)`). What changes for LIRR is how `baseColor` is computed before being passed in.
+
+**Outbound timetable `baseColor`:** Same as existing subway logic — single route → that route's color; multiple routes → `#0039A6` (MTA blue).
+
+**Inbound timetable `baseColor`** — three-tier rule, evaluated in order:
+
+1. **Dominant route (>2/3 of filtered inbound departures share one `routeId`):** `baseColor` = that route's `routeColor` from GTFS.
+2. **City terminal majority (≥2/3 of filtered inbound departures have a headsign in the city terminal list):** `baseColor` = `#4D5357` (City Terminal Zone gray — route 12's official GTFS color).
+3. **Neither:** `baseColor` = `#0039A6` (MTA blue).
+
+City terminal headsign list (used only for tier-2 check above):
+- `Penn Station`, `Grand Central`, `Atlantic Terminal`, `Jamaica`, `Woodside`, `Hunterspoint Avenue`, `Long Island City`
+
+> Note: verify these strings match actual OBA LIRR headsign values at implementation time.
+
+The 0.12 opacity transformation from `computeRowColor` applies to whichever `baseColor` is chosen, unchanged.
+
+**Specific destination selected:** When the user picks a single destination, `baseColor` follows the outbound rule (single route → route color) regardless of direction, since only one headsign is shown.
 
 ---
 

@@ -42,6 +42,7 @@ public class ObaResponse {
         public long departureTime;
         public boolean departureEnabled;
         public String stopHeadsign;
+        public String tripId;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -64,5 +65,6 @@ public class ObaResponse {
         public String name;
         public String direction;
         public String parent;
+        public String stopCode;
     }
 }

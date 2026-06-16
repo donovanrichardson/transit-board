@@ -41,7 +41,7 @@ public class ScheduleParser {
 
                     Instant departureTime = Instant.ofEpochMilli(sst.departureTime);
                     departures.add(new Departure(srs.routeId, routeShortName, headsign,
-                            departureTime, routeColor, routeTextColor));
+                            departureTime, routeColor, routeTextColor, sst.tripId));
                 }
             }
         }

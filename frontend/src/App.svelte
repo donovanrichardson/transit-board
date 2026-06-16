@@ -1,16 +1,23 @@
 <script>
   import { onMount } from 'svelte';
-  import { fetchSchedule } from './lib/api.js';
+  import { fetchSchedule, fetchStops } from './lib/api.js';
+  import { isLirr } from './lib/lirr.js';
   import Header from './components/Header.svelte';
   import DatePicker from './components/DatePicker.svelte';
   import HeadsignFilter from './components/HeadsignFilter.svelte';
+  import DestinationPicker from './components/DestinationPicker.svelte';
   import Timetable from './components/Timetable.svelte';
   import LoadingIndicator from './components/LoadingIndicator.svelte';
+  import HomePage from './components/HomePage.svelte';
 
-  // Extract stop ID from URL path: /stop/{stopId}
+  // Determine page mode from URL
   function getStopIdFromPath() {
     const match = window.location.pathname.match(/^\/stop\/(.+)$/);
     return match ? decodeURIComponent(match[1]) : null;
+  }
+
+  function isHomePage() {
+    return window.location.pathname === '/';
   }
 
   function todayString() {
@@ -21,20 +28,33 @@
     return `${y}-${m}-${d}`;
   }
 
+  const onHome = isHomePage();
   const stopId = getStopIdFromPath();
+  const lirrMode = stopId ? isLirr(stopId) : false;
+
   let date = todayString();
 
+  // Stop page state
   let loading = false;
   let error = null;
   let data = null;
 
   let selectedHeadsigns = new Set();
 
+  // LIRR destination picker state
+  let lirrDestinationMode = 'inbound';
+  let lirrSelectedHeadsign = null;
+
   $: routes = data ? data.routes : [];
   $: agencyColor = data ? data.agencyColor : null;
   $: departures = data ? data.departures : [];
   $: headsigns = data ? data.headsigns : [];
   $: stop = data ? data.stop : null;
+
+  // Home page state
+  let homeLoading = false;
+  let homeError = null;
+  let homeStops = [];
 
   // Base color for loading indicator
   $: baseColor = (() => {
@@ -57,7 +77,6 @@
     error = null;
     try {
       data = await fetchSchedule(stopId, date);
-      // Initialize all headsigns as selected
       selectedHeadsigns = new Set(data.headsigns);
     } catch (e) {
       const status = e.message;
@@ -73,8 +92,25 @@
     }
   }
 
+  async function loadHomeStops() {
+    homeLoading = true;
+    homeError = null;
+    try {
+      const result = await fetchStops('LI');
+      homeStops = result.stops || [];
+    } catch (e) {
+      homeError = 'Could not load stations. Try again later.';
+    } finally {
+      homeLoading = false;
+    }
+  }
+
   onMount(() => {
-    loadSchedule();
+    if (onHome) {
+      loadHomeStops();
+    } else if (stopId) {
+      loadSchedule();
+    }
   });
 
   function onDateChange(e) {
@@ -85,20 +121,43 @@
   function onHeadsignChange(e) {
     selectedHeadsigns = e.detail.selected;
   }
+
+  function onDestinationChange(e) {
+    const { mode, headsign } = e.detail;
+    if (mode === 'specific') {
+      lirrDestinationMode = 'specific';
+      lirrSelectedHeadsign = headsign;
+    } else {
+      lirrDestinationMode = mode;
+      lirrSelectedHeadsign = null;
+    }
+  }
 </script>
 
 <div class="app">
-  {#if stopId}
+  {#if onHome}
+    <HomePage
+      stops={homeStops}
+      loading={homeLoading}
+      error={homeError}
+    />
+  {:else if stopId}
     <Header
       {stop}
       {headsigns}
       {selectedHeadsigns}
       {departures}
+      isLirrMode={lirrMode}
     />
 
     <DatePicker {date} on:change={onDateChange} />
 
-    {#if headsigns.length > 0}
+    {#if lirrMode}
+      <DestinationPicker
+        {headsigns}
+        on:change={onDestinationChange}
+      />
+    {:else if headsigns.length > 0}
       <HeadsignFilter
         {headsigns}
         selected={selectedHeadsigns}
@@ -116,6 +175,9 @@
         {routes}
         {agencyColor}
         {selectedHeadsigns}
+        isLirrMode={lirrMode}
+        {lirrDestinationMode}
+        {lirrSelectedHeadsign}
       />
     {/if}
   {:else}

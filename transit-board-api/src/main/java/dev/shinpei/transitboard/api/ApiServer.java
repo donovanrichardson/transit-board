@@ -25,10 +25,12 @@ public class ApiServer {
      */
     public static HttpServer create(int port, String obaBaseUrl) throws IOException {
         ObaClient obaClient = new ObaClient(obaBaseUrl);
-        ScheduleApiHandler handler = new ScheduleApiHandler(obaClient);
+        ScheduleApiHandler scheduleHandler = new ScheduleApiHandler(obaClient);
+        StopsApiHandler stopsHandler = new StopsApiHandler(obaClient);
 
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-        server.createContext("/api/schedule", handler);
+        server.createContext("/api/schedule", scheduleHandler);
+        server.createContext("/api/stops", stopsHandler);
         return server;
     }
 }

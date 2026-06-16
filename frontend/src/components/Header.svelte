@@ -3,6 +3,7 @@
   export let headsigns = [];
   export let selectedHeadsigns = new Set();
   export let departures = [];
+  export let isLirrMode = false;
 
   /**
    * Computes the majority routeColor for a given headsign.
@@ -31,10 +32,10 @@
     return { bg: '#' + best.color, text: '#' + (best.textColor || 'FFFFFF') };
   }
 
-  $: hasDirection = stop && stop.direction;
-  $: hasSiblings = stop && stop.siblingStopIds && stop.siblingStopIds.length > 0;
+  $: hasDirection = !isLirrMode && stop && stop.direction;
+  $: hasSiblings = !isLirrMode && stop && stop.siblingStopIds && stop.siblingStopIds.length > 0;
   $: stopTitle = stop
-    ? (stop.direction ? `${stop.name} (${stop.direction})` : stop.name)
+    ? ((!isLirrMode && stop.direction) ? `${stop.name} (${stop.direction})` : stop.name)
     : 'Loading…';
 
   $: visibleHeadsigns = hasDirection

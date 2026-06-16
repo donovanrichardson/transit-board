@@ -1,18 +1,51 @@
 <script>
   import MinuteCell from './MinuteCell.svelte';
-  import { groupByHour, computeRowColor, computeRouteIconVisibility } from '../lib/timetable.js';
+  import { groupByHour, computeRowColor, computeRouteIconVisibility, computeHeadsignAbbreviationVisibility } from '../lib/timetable.js';
+  import { HEADSIGN_ABBREVIATIONS, CITY_TERMINALS } from '../lib/lirr.js';
 
   export let departures = [];
   export let routes = [];
   export let agencyColor = null;
   export let selectedHeadsigns = new Set();
+  export let isLirrMode = false;
+  // For LIRR: 'inbound' | 'outbound' | 'specific'
+  export let lirrDestinationMode = 'inbound';
+  // For LIRR specific destination
+  export let lirrSelectedHeadsign = null;
 
-  $: filteredDepartures = departures.filter(
-    (d) => !d.headsign || selectedHeadsigns.has(d.headsign)
-  );
+  $: filteredDepartures = (() => {
+    if (!isLirrMode) {
+      return departures.filter((d) => !d.headsign || selectedHeadsigns.has(d.headsign));
+    }
+    if (lirrDestinationMode === 'specific' && lirrSelectedHeadsign) {
+      return departures.filter((d) => d.headsign === lirrSelectedHeadsign);
+    }
+    if (lirrDestinationMode === 'outbound') {
+      return departures.filter((d) => d.directionId === '0');
+    }
+    // inbound (default)
+    return departures.filter((d) => d.directionId === '1');
+  })();
 
   // Determine base color for row tinting
   $: baseColor = (() => {
+    if (isLirrMode && lirrDestinationMode === 'inbound') {
+      // Inbound: 1 routeId >2/3 → that color; ≥2/3 city-terminal headsigns → #4D5357; else #0039A6
+      const routeIds = filteredDepartures.map((d) => d.routeId);
+      const total = routeIds.length;
+      if (total > 0) {
+        const counts = {};
+        for (const id of routeIds) counts[id] = (counts[id] || 0) + 1;
+        const [topId, topCount] = Object.entries(counts).reduce((a, b) => b[1] > a[1] ? b : a);
+        if (topCount > (2 / 3) * total) {
+          const route = routes.find((r) => r.id === topId);
+          if (route && route.color) return route.color;
+        }
+        const cityTerminalCount = filteredDepartures.filter((d) => CITY_TERMINALS.includes(d.headsign)).length;
+        if (cityTerminalCount >= (2 / 3) * total) return '4D5357';
+      }
+      return '0039A6';
+    }
     const routeIds = [...new Set(filteredDepartures.map((d) => d.routeId))];
     if (routeIds.length === 1) {
       const route = routes.find((r) => r.id === routeIds[0]);
@@ -22,6 +55,7 @@
   })();
 
   $: iconVisibility = computeRouteIconVisibility(filteredDepartures);
+  $: headsignAbbrevVisibility = computeHeadsignAbbreviationVisibility(filteredDepartures);
 
   $: grouped = groupByHour(filteredDepartures);
 
@@ -52,7 +86,10 @@
               {#each rowDepartures as dep}
                 <MinuteCell
                   departure={dep}
-                  showIcon={iconVisibility[dep.routeId] || false}
+                  showIcon={isLirrMode ? false : (iconVisibility[dep.routeId] || false)}
+                  showAbbreviation={isLirrMode ? (headsignAbbrevVisibility[dep.headsign] || false) : false}
+                  abbreviation={isLirrMode ? (HEADSIGN_ABBREVIATIONS[dep.headsign] || '') : ''}
+                  {isLirrMode}
                 />
               {/each}
             </td>

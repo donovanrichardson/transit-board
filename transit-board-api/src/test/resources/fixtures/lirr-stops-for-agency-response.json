@@ -1,0 +1,11 @@
+{
+  "code": 200,
+  "data": {
+    "list": [
+      { "id": "LI_200", "name": "Penn Station", "stopCode": "NYP" },
+      { "id": "LI_102", "name": "Jamaica", "stopCode": "JAM" },
+      { "id": "LI_102B", "name": "Jamaica", "stopCode": "JAM" },
+      { "id": "LI_300", "name": "Babylon", "stopCode": "BAB" }
+    ]
+  }
+}

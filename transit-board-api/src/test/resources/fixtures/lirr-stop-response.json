@@ -1,0 +1,14 @@
+{
+  "data": {
+    "entry": {
+      "id": "LI_102",
+      "name": "Jamaica",
+      "direction": null,
+      "parent": null
+    },
+    "references": {
+      "routes": [],
+      "stops": []
+    }
+  }
+}

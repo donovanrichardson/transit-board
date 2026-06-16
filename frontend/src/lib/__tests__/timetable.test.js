@@ -3,6 +3,8 @@ import {
   groupByHour,
   computeRowColor,
   computeRouteIconVisibility,
+  computeHeadsignAbbreviationVisibility,
+  filterByDirection,
 } from '../timetable.js';
 
 describe('timetable.groupByHour', () => {
@@ -97,5 +99,57 @@ describe('timetable.routeIconVisibilitySingleRoute - one route, no icons', () =>
     const result = computeRouteIconVisibility(departures);
 
     expect(result['A']).toBe(false);
+  });
+});
+
+describe('timetable.computeHeadsignAbbreviationVisibility', () => {
+  it('single unique headsign: all cells false (no abbreviation)', () => {
+    const departures = Array(5).fill({ headsign: 'Penn Station' });
+    const result = computeHeadsignAbbreviationVisibility(departures);
+    for (const dep of departures) {
+      expect(result['Penn Station']).toBe(false);
+    }
+  });
+
+  it('dominant headsign >2/3: minority cells show abbreviation, dominant does not', () => {
+    // Penn Station: 7, Jamaica: 3; total 10; 7 > 6.67 → Penn Station dominant
+    const departures = [
+      ...Array(7).fill({ headsign: 'Penn Station' }),
+      ...Array(3).fill({ headsign: 'Jamaica' }),
+    ];
+    const result = computeHeadsignAbbreviationVisibility(departures);
+    expect(result['Penn Station']).toBe(false);
+    expect(result['Jamaica']).toBe(true);
+  });
+
+  it('no dominant headsign: all cells show abbreviation', () => {
+    const departures = [
+      ...Array(5).fill({ headsign: 'Penn Station' }),
+      ...Array(5).fill({ headsign: 'Jamaica' }),
+    ];
+    const result = computeHeadsignAbbreviationVisibility(departures);
+    expect(result['Penn Station']).toBe(true);
+    expect(result['Jamaica']).toBe(true);
+  });
+});
+
+describe('timetable.filterByDirection', () => {
+  const departures = [
+    { headsign: 'Penn Station', directionId: '1' },
+    { headsign: 'Penn Station', directionId: '1' },
+    { headsign: 'Babylon', directionId: '0' },
+    { headsign: 'Ronkonkoma', directionId: '0' },
+  ];
+
+  it('inbound: filters to directionId === "1"', () => {
+    const result = filterByDirection(departures, '1');
+    expect(result).toHaveLength(2);
+    result.forEach((d) => expect(d.directionId).toBe('1'));
+  });
+
+  it('outbound: filters to directionId === "0"', () => {
+    const result = filterByDirection(departures, '0');
+    expect(result).toHaveLength(2);
+    result.forEach((d) => expect(d.directionId).toBe('0'));
   });
 });

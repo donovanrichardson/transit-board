@@ -1,6 +1,7 @@
 package dev.shinpei.transitboard.api;
 
 import java.util.List;
+import java.util.Map;
 
 public class ScheduleResponse {
 
@@ -11,6 +12,7 @@ public class ScheduleResponse {
     public List<String> headsigns;
     public List<DepartureInfo> departures;
     public String agencyColor;
+    public Map<String, String> headsignAbbreviations;
 
     public static class StopInfo {
         public String id;
@@ -36,5 +38,7 @@ public class ScheduleResponse {
         public String routeColor;
         public String routeTextColor;
         public String headsign;
+        public String tripId;
+        public String directionId;
     }
 }

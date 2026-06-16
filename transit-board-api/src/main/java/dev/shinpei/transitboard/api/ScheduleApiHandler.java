@@ -6,6 +6,7 @@ import com.sun.net.httpserver.HttpHandler;
 import dev.shinpei.transitboard.model.Departure;
 import dev.shinpei.transitboard.model.ObaResponse;
 import dev.shinpei.transitboard.model.ObaStopResponse;
+import dev.shinpei.transitboard.model.ObaTripResponse;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -122,6 +124,26 @@ public class ScheduleApiHandler implements HttpHandler {
         // Parse departures
         List<Departure> departures = scheduleParser.parse(scheduleOba);
 
+        // Resolve directionId per unique tripId (cache per request)
+        Map<String, String> tripDirectionCache = new HashMap<>();
+        for (Departure d : departures) {
+            String tripId = d.getTripId();
+            if (tripId != null && !tripId.isEmpty()) {
+                String directionId = tripDirectionCache.computeIfAbsent(tripId, tid -> {
+                    try {
+                        ObaTripResponse tripResponse = obaClient.fetchTrip(tid);
+                        if (tripResponse != null && tripResponse.data != null
+                                && tripResponse.data.entry != null) {
+                            return tripResponse.data.entry.directionId;
+                        }
+                    } catch (Exception ignored) {
+                    }
+                    return null;
+                });
+                d.setDirectionId(directionId);
+            }
+        }
+
         // Build routes list (deduplicated, preserving order)
         Map<String, ObaResponse.Route> routeById = new LinkedHashMap<>();
         if (scheduleOba.data.references != null && scheduleOba.data.references.routes != null) {
@@ -158,6 +180,8 @@ public class ScheduleApiHandler implements HttpHandler {
             di.routeColor = d.getRouteColor();
             di.routeTextColor = d.getRouteTextColor();
             di.headsign = d.getHeadsign();
+            di.tripId = d.getTripId();
+            di.directionId = d.getDirectionId();
             departureInfos.add(di);
         }
 
@@ -177,6 +201,7 @@ public class ScheduleApiHandler implements HttpHandler {
         response.headsigns = headsigns;
         response.departures = departureInfos;
         response.agencyColor = null;
+        response.headsignAbbreviations = Collections.emptyMap();
 
         return response;
     }

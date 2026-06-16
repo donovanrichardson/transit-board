@@ -1,12 +1,21 @@
 <script>
   export let departure;
   export let showIcon = false;
+  export let showAbbreviation = false;
+  export let abbreviation = '';
+  export let isLirrMode = false;
 </script>
 
-<div class="minute-cell">
+<div class="minute-cell" class:lirr={isLirrMode}>
   <span class="minute-value">{String(departure.minute).padStart(2, '0')}</span>
   <span class="icon-area">
-    {#if showIcon}
+    {#if isLirrMode}
+      {#if showAbbreviation && abbreviation}
+        <span class="headsign-abbr">{abbreviation}</span>
+      {:else}
+        <span class="icon-placeholder"></span>
+      {/if}
+    {:else if showIcon}
       <span
         class="route-icon"
         style="background-color: #{departure.routeColor || '999999'}; color: #{departure.routeTextColor || 'FFFFFF'};"
@@ -29,6 +38,11 @@
     min-width: 40px;
     padding: 2px 1px;
     position: relative;
+  }
+
+  .minute-cell.lirr {
+    width: 46px;
+    min-width: 46px;
   }
 
   .minute-value {
@@ -60,5 +74,12 @@
     display: inline-block;
     width: 14px;
     height: 14px;
+  }
+
+  .headsign-abbr {
+    font-size: 0.45rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #333;
   }
 </style>
