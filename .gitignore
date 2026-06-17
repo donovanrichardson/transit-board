@@ -5,3 +5,4 @@ transit-board-api/target/
 logs/monitor.jsonl
 frontend/node_modules/
 frontend/dist/
+monitor/__pycache__/
