@@ -49,6 +49,7 @@
   $: agencyColor = data ? data.agencyColor : null;
   $: departures = data ? data.departures : [];
   $: headsigns = data ? data.headsigns : [];
+  $: destinations = data ? data.destinations : [];
   $: stop = data ? data.stop : null;
 
   // Home page state
@@ -155,6 +156,7 @@
     {#if lirrMode}
       <DestinationPicker
         {headsigns}
+        {destinations}
         on:change={onDestinationChange}
       />
     {:else if headsigns.length > 0}

@@ -10,6 +10,7 @@ public class ScheduleResponse {
     public String timeZone;
     public List<RouteInfo> routes;
     public List<String> headsigns;
+    public List<String> destinations;
     public List<DepartureInfo> departures;
     public String agencyColor;
     public Map<String, String> headsignAbbreviations;
@@ -40,5 +41,6 @@ public class ScheduleResponse {
         public String headsign;
         public String tripId;
         public String directionId;
+        public List<String> downstreamStops;
     }
 }

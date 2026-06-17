@@ -7,6 +7,7 @@ import dev.shinpei.transitboard.model.Departure;
 import dev.shinpei.transitboard.model.ObaResponse;
 import dev.shinpei.transitboard.model.ObaStopResponse;
 import dev.shinpei.transitboard.model.ObaTripResponse;
+import dev.shinpei.transitboard.model.ObaTripScheduleResponse;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -144,6 +145,50 @@ public class ScheduleApiHandler implements HttpHandler {
             }
         }
 
+        // Resolve downstream stops per unique tripId (cache per request)
+        Map<String, List<String>> tripDownstreamCache = new HashMap<>();
+        for (Departure d : departures) {
+            String tripId = d.getTripId();
+            if (tripId != null && !tripId.isEmpty()) {
+                tripDownstreamCache.computeIfAbsent(tripId, tid -> {
+                    try {
+                        ObaTripScheduleResponse schedResp = obaClient.fetchTripSchedule(tid);
+                        if (schedResp == null || schedResp.data == null
+                                || schedResp.data.entry == null
+                                || schedResp.data.entry.schedule == null
+                                || schedResp.data.entry.schedule.stopTimes == null) {
+                            return Collections.emptyList();
+                        }
+                        List<ObaTripScheduleResponse.StopTime> stopTimes = schedResp.data.entry.schedule.stopTimes;
+                        Map<String, String> stopNameById = new HashMap<>();
+                        if (schedResp.data.references != null && schedResp.data.references.stops != null) {
+                            for (ObaResponse.Stop s : schedResp.data.references.stops) {
+                                stopNameById.put(s.id, s.name);
+                            }
+                        }
+                        int queriedIndex = -1;
+                        for (int i = 0; i < stopTimes.size(); i++) {
+                            if (stopId.equals(stopTimes.get(i).stopId)) {
+                                queriedIndex = i;
+                                break;
+                            }
+                        }
+                        if (queriedIndex < 0) {
+                            return Collections.emptyList();
+                        }
+                        List<String> downstream = new ArrayList<>();
+                        for (int i = queriedIndex + 1; i < stopTimes.size(); i++) {
+                            String name = stopNameById.get(stopTimes.get(i).stopId);
+                            if (name != null) downstream.add(name);
+                        }
+                        return downstream;
+                    } catch (Exception ignored) {
+                        return Collections.emptyList();
+                    }
+                });
+            }
+        }
+
         // Build routes list (deduplicated, preserving order)
         Map<String, ObaResponse.Route> routeById = new LinkedHashMap<>();
         if (scheduleOba.data.references != null && scheduleOba.data.references.routes != null) {
@@ -182,8 +227,16 @@ public class ScheduleApiHandler implements HttpHandler {
             di.headsign = d.getHeadsign();
             di.tripId = d.getTripId();
             di.directionId = d.getDirectionId();
+            di.downstreamStops = tripDownstreamCache.getOrDefault(d.getTripId(), Collections.emptyList());
             departureInfos.add(di);
         }
+
+        // Build destinations (sorted, deduplicated set of all downstream stop names)
+        TreeSet<String> destinationSet = new TreeSet<>();
+        for (List<String> stops : tripDownstreamCache.values()) {
+            destinationSet.addAll(stops);
+        }
+        List<String> destinations = new ArrayList<>(destinationSet);
 
         // Build stop info
         ScheduleResponse.StopInfo stopInfo = new ScheduleResponse.StopInfo();
@@ -199,6 +252,7 @@ public class ScheduleApiHandler implements HttpHandler {
         response.timeZone = timeZone;
         response.routes = routes;
         response.headsigns = headsigns;
+        response.destinations = destinations;
         response.departures = departureInfos;
         response.agencyColor = null;
         response.headsignAbbreviations = Collections.emptyMap();

@@ -1,0 +1,23 @@
+{
+  "data": {
+    "entry": {
+      "tripId": "LI_trip_001",
+      "schedule": {
+        "stopTimes": [
+          { "stopId": "LI_102" },
+          { "stopId": "LI_103" },
+          { "stopId": "LI_104" },
+          { "stopId": "LI_105" }
+        ]
+      }
+    },
+    "references": {
+      "stops": [
+        { "id": "LI_102", "name": "Mineola" },
+        { "id": "LI_103", "name": "Merillon Avenue" },
+        { "id": "LI_104", "name": "New Hyde Park" },
+        { "id": "LI_105", "name": "Penn Station" }
+      ]
+    }
+  }
+}

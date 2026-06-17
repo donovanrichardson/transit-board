@@ -18,7 +18,7 @@
       return departures.filter((d) => !d.headsign || selectedHeadsigns.has(d.headsign));
     }
     if (lirrDestinationMode === 'specific' && lirrSelectedHeadsign) {
-      return departures.filter((d) => d.headsign === lirrSelectedHeadsign);
+      return departures.filter((d) => d.downstreamStops && d.downstreamStops.includes(lirrSelectedHeadsign));
     }
     if (lirrDestinationMode === 'outbound') {
       return departures.filter((d) => d.directionId === '0');

@@ -2,6 +2,7 @@
   import { createEventDispatcher } from 'svelte';
 
   export let headsigns = [];
+  export let destinations = [];
 
   const dispatch = createEventDispatcher();
 
@@ -12,7 +13,8 @@
 
   let searchText = '';
 
-  $: filteredHeadsigns = headsigns.filter((h) =>
+  $: displayList = destinations.length > 0 ? destinations : headsigns;
+  $: filteredHeadsigns = displayList.filter((h) =>
     h.toLowerCase().includes(searchText.toLowerCase())
   );
 

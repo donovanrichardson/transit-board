@@ -1,4 +1,6 @@
 <script>
+  import { CITY_TERMINALS } from '../lib/lirr.js';
+
   export let stop = null;
   export let headsigns = [];
   export let selectedHeadsigns = new Set();
@@ -6,18 +8,51 @@
   export let isLirrMode = false;
 
   /**
-   * Computes the majority routeColor for a given headsign.
-   * Returns { color, textColor } or fallback colors.
+   * Computes the pill background/text color for a given headsign.
+   * In LIRR mode: applies 2/3 dominance threshold.
+   * In non-LIRR mode: plurality pick (unchanged).
    */
   function headsignColor(headsign) {
     const counts = {};
     for (const d of departures) {
       if (d.headsign === headsign) {
         const id = d.routeId;
-        counts[id] = (counts[id] || { count: 0, color: d.routeColor, textColor: d.routeTextColor });
+        if (!counts[id]) counts[id] = { count: 0, color: d.routeColor, textColor: d.routeTextColor };
         counts[id].count++;
       }
     }
+
+    if (isLirrMode) {
+      const total = Object.values(counts).reduce((s, v) => s + v.count, 0);
+      if (total === 0) return { bg: '#666666', text: '#FFFFFF' };
+
+      let topId = null;
+      let topCount = 0;
+      for (const [id, v] of Object.entries(counts)) {
+        if (v.count > topCount) {
+          topCount = v.count;
+          topId = id;
+        }
+      }
+
+      if (topCount > (2 / 3) * total) {
+        const best = counts[topId];
+        if (best && best.color) {
+          return { bg: '#' + best.color, text: '#' + (best.textColor || 'FFFFFF') };
+        }
+      }
+
+      const cityTerminalCount = departures.filter(
+        (d) => d.headsign === headsign && CITY_TERMINALS.includes(d.headsign)
+      ).length;
+      if (cityTerminalCount >= (2 / 3) * total) {
+        return { bg: '#4D5357', text: '#FFFFFF' };
+      }
+
+      return { bg: '#0039A6', text: '#FFFFFF' };
+    }
+
+    // Non-LIRR: plurality pick
     let max = 0;
     let best = null;
     for (const v of Object.values(counts)) {

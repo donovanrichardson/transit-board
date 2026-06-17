@@ -5,6 +5,7 @@ import dev.shinpei.transitboard.model.ObaResponse;
 import dev.shinpei.transitboard.model.ObaStopResponse;
 import dev.shinpei.transitboard.model.ObaStopsForAgencyResponse;
 import dev.shinpei.transitboard.model.ObaTripResponse;
+import dev.shinpei.transitboard.model.ObaTripScheduleResponse;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -55,6 +56,12 @@ public class ObaClient {
     public ObaStopsForAgencyResponse fetchStopsForAgency(String agencyId) {
         String url = baseUrl + "/api/where/stops-for-agency/" + agencyId + ".json?key=" + API_KEY;
         return fetchAs(url, ObaStopsForAgencyResponse.class);
+    }
+
+    public ObaTripScheduleResponse fetchTripSchedule(String tripId) {
+        String encodedTripId = tripId.replace(" ", "%20");
+        String url = baseUrl + "/api/where/trip-details/" + encodedTripId + ".json?key=" + API_KEY;
+        return fetchAs(url, ObaTripScheduleResponse.class);
     }
 
     private <T> T fetchAs(String url, Class<T> type) {
