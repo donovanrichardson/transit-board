@@ -158,3 +158,42 @@ export function computeHeadsignAbbreviationVisibility(departures) {
 export function filterByDirection(departures, directionId) {
   return departures.filter((d) => d.directionId === directionId);
 }
+
+/**
+ * Filters departures based on current UI state.
+ *
+ * @param {Array} departures
+ * @param {{ isLirrMode: boolean, lirrDestinationMode: string, lirrSelectedHeadsign: string|null, selectedHeadsigns: Set }} options
+ * @returns {Array} filtered departures
+ */
+export function filterDepartures(departures, { isLirrMode, lirrDestinationMode, lirrSelectedHeadsign, selectedHeadsigns }) {
+  if (!isLirrMode) {
+    return departures.filter((d) => !d.headsign || selectedHeadsigns.has(d.headsign));
+  }
+  if (lirrDestinationMode === 'specific' && lirrSelectedHeadsign) {
+    return departures.filter((d) => d.downstreamStops && d.downstreamStops.includes(lirrSelectedHeadsign));
+  }
+  if (lirrDestinationMode === 'outbound') {
+    return departures.filter((d) => d.directionId === '0');
+  }
+  return departures.filter((d) => d.directionId === '1');
+}
+
+/**
+ * Formats an hour number as a display label.
+ *
+ * @param {number} hour - hour value (may be >= 24 for service-day convention)
+ * @param {'12h'|'24h'} clockMode
+ * @returns {string}
+ */
+export function formatHourLabel(hour, clockMode) {
+  if (clockMode === '24h') {
+    return String(hour).padStart(2, '0');
+  }
+  // 12h mode — unwrap service-day hours >= 24
+  const h = hour >= 24 ? hour - 24 : hour;
+  if (h === 0) return '12a';
+  if (h < 12) return `${h}a`;
+  if (h === 12) return '12p';
+  return `${h - 12}p`;
+}

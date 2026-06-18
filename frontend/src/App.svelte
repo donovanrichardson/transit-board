@@ -2,10 +2,12 @@
   import { onMount } from 'svelte';
   import { fetchSchedule, fetchStops } from './lib/api.js';
   import { isLirr } from './lib/lirr.js';
+  import { filterDepartures } from './lib/timetable.js';
   import Header from './components/Header.svelte';
   import DatePicker from './components/DatePicker.svelte';
   import HeadsignFilter from './components/HeadsignFilter.svelte';
   import DestinationPicker from './components/DestinationPicker.svelte';
+  import ClockToggle from './components/ClockToggle.svelte';
   import Timetable from './components/Timetable.svelte';
   import LoadingIndicator from './components/LoadingIndicator.svelte';
   import HomePage from './components/HomePage.svelte';
@@ -45,12 +47,23 @@
   let lirrDestinationMode = 'inbound';
   let lirrSelectedHeadsign = null;
 
+  // Clock mode state — read from localStorage, default '12h'
+  let clockMode = (() => {
+    try {
+      return localStorage.getItem('transitBoard.clockMode') === '24h' ? '24h' : '12h';
+    } catch (_) {
+      return '12h';
+    }
+  })();
+
   $: routes = data ? data.routes : [];
   $: agencyColor = data ? data.agencyColor : null;
   $: departures = data ? data.departures : [];
   $: headsigns = data ? data.headsigns : [];
   $: destinations = data ? data.destinations : [];
   $: stop = data ? data.stop : null;
+
+  $: filteredDepartures = filterDepartures(departures, { isLirrMode: lirrMode, lirrDestinationMode, lirrSelectedHeadsign, selectedHeadsigns });
 
   // Home page state
   let homeLoading = false;
@@ -133,6 +146,15 @@
       lirrSelectedHeadsign = null;
     }
   }
+
+  function onClockModeChange(e) {
+    clockMode = e.detail.clockMode;
+    try {
+      localStorage.setItem('transitBoard.clockMode', clockMode);
+    } catch (_) {
+      // ignore
+    }
+  }
 </script>
 
 <div class="app">
@@ -145,13 +167,20 @@
   {:else if stopId}
     <Header
       {stop}
-      {headsigns}
-      {selectedHeadsigns}
-      {departures}
+      departures={filteredDepartures}
       isLirrMode={lirrMode}
     />
 
+    <div class="print-date">
+      {(() => {
+        const [year, month, day] = date.split('-').map(Number);
+        return new Intl.DateTimeFormat('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(year, month - 1, day));
+      })()}
+    </div>
+
     <DatePicker {date} on:change={onDateChange} />
+
+    <ClockToggle {clockMode} on:change={onClockModeChange} />
 
     {#if lirrMode}
       <DestinationPicker
@@ -180,6 +209,7 @@
         isLirrMode={lirrMode}
         {lirrDestinationMode}
         {lirrSelectedHeadsign}
+        {clockMode}
       />
     {/if}
   {:else}
@@ -208,5 +238,17 @@
     padding: 24px 16px;
     color: #cc0000;
     font-size: 1rem;
+  }
+
+  .print-date {
+    display: none;
+    padding: 8px 16px;
+    font-size: 1rem;
+  }
+
+  @media print {
+    .print-date {
+      display: block;
+    }
   }
 </style>

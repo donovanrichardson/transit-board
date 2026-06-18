@@ -28,6 +28,12 @@
     padding: 8px 16px;
   }
 
+  @media print {
+    .date-picker {
+      display: none;
+    }
+  }
+
   label {
     font-size: 0.9rem;
     font-weight: 500;

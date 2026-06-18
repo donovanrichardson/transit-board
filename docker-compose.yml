@@ -72,6 +72,29 @@ services:
     depends_on:
       - transit-board-api
     restart: always
+    labels:
+      caddy: board.example.com
+      caddy.reverse_proxy: "transit-board-frontend-1:80"
+    networks:
+      - default
+      - proxy-net
+
+  gtfs_updater:
+    build: ./gtfs-updater
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./oba-server/bundle:/bundle
+      - .:/compose:ro
+    environment:
+      - GTFS_FEED_URL=https://rrgtfsfeeds.s3.amazonaws.com/gtfslirr.zip
+      - GTFS_UPDATE_HOUR=5
+      - MYSQL_HOST=oba_database
+      - MYSQL_USER=${JDBC_USER:-oba}
+      - MYSQL_PASSWORD=${JDBC_PASSWORD}
+      - MYSQL_DATABASE=oba_database
+    depends_on:
+      - oba_database
+    restart: unless-stopped
 
   monitor:
     build: ./monitor
@@ -85,3 +108,9 @@ services:
 
 volumes:
   mysql-data:
+
+networks:
+  default: {}
+  proxy-net:
+    external: true
+    name: external-proxy-net

@@ -2,8 +2,6 @@
   import { CITY_TERMINALS } from '../lib/lirr.js';
 
   export let stop = null;
-  export let headsigns = [];
-  export let selectedHeadsigns = new Set();
   export let departures = [];
   export let isLirrMode = false;
 
@@ -75,7 +73,7 @@
 
   $: visibleHeadsigns = hasDirection
     ? []
-    : headsigns.filter((h) => selectedHeadsigns.has(h));
+    : [...new Set(departures.map((d) => d.headsign).filter(Boolean))];
 </script>
 
 <header class="timetable-header">

@@ -1,6 +1,6 @@
 <script>
   import MinuteCell from './MinuteCell.svelte';
-  import { groupByHour, computeRowColor, computeRouteIconVisibility, computeHeadsignAbbreviationVisibility } from '../lib/timetable.js';
+  import { groupByHour, computeRowColor, computeRouteIconVisibility, computeHeadsignAbbreviationVisibility, filterDepartures, formatHourLabel } from '../lib/timetable.js';
   import { HEADSIGN_ABBREVIATIONS, CITY_TERMINALS } from '../lib/lirr.js';
 
   export let departures = [];
@@ -12,20 +12,10 @@
   export let lirrDestinationMode = 'inbound';
   // For LIRR specific destination
   export let lirrSelectedHeadsign = null;
+  // Clock display mode
+  export let clockMode = '12h';
 
-  $: filteredDepartures = (() => {
-    if (!isLirrMode) {
-      return departures.filter((d) => !d.headsign || selectedHeadsigns.has(d.headsign));
-    }
-    if (lirrDestinationMode === 'specific' && lirrSelectedHeadsign) {
-      return departures.filter((d) => d.downstreamStops && d.downstreamStops.includes(lirrSelectedHeadsign));
-    }
-    if (lirrDestinationMode === 'outbound') {
-      return departures.filter((d) => d.directionId === '0');
-    }
-    // inbound (default)
-    return departures.filter((d) => d.directionId === '1');
-  })();
+  $: filteredDepartures = filterDepartures(departures, { isLirrMode, lirrDestinationMode, lirrSelectedHeadsign, selectedHeadsigns });
 
   // Determine base color for row tinting
   $: baseColor = (() => {
@@ -81,8 +71,13 @@
           {@const rowDepartures = (grouped[String(hour)] || []).sort((a, b) => a.minute - b.minute)}
           {@const bgColor = computeRowColor(baseColor, null, hour)}
           <tr class="timetable-row" style="background-color: {bgColor};">
-            <td class="hour-cell">{String(hour).padStart(2, '0')}</td>
+            <td class="hour-cell">{formatHourLabel(hour, clockMode)}</td>
             <td class="minutes-cell">
+              {#if rowDepartures.length === 0}
+                <span class="row-height-spacer" aria-hidden="true">
+                  <MinuteCell departure={{ minute: 0, routeId: '', routeColor: '', routeTextColor: '' }} {isLirrMode} />
+                </span>
+              {/if}
               {#each rowDepartures as dep}
                 <MinuteCell
                   departure={dep}
@@ -116,8 +111,8 @@
   }
 
   .hour-cell {
-    width: 48px;
-    min-width: 48px;
+    width: 52px;
+    min-width: 52px;
     padding: 4px 8px;
     font-size: 1rem;
     font-weight: 700;
@@ -133,6 +128,10 @@
     flex-wrap: wrap;
     gap: 2px;
     vertical-align: top;
+  }
+
+  .row-height-spacer {
+    visibility: hidden;
   }
 
   .no-service {

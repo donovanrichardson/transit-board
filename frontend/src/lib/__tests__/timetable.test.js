@@ -5,6 +5,8 @@ import {
   computeRouteIconVisibility,
   computeHeadsignAbbreviationVisibility,
   filterByDirection,
+  filterDepartures,
+  formatHourLabel,
 } from '../timetable.js';
 
 describe('timetable.groupByHour', () => {
@@ -130,6 +132,105 @@ describe('timetable.computeHeadsignAbbreviationVisibility', () => {
     const result = computeHeadsignAbbreviationVisibility(departures);
     expect(result['Penn Station']).toBe(true);
     expect(result['Jamaica']).toBe(true);
+  });
+});
+
+describe('timetable.filterDepartures', () => {
+  const nonLirrDeps = [
+    { headsign: 'Flushing-Main St', routeId: 'R1' },
+    { headsign: 'Jamaica', routeId: 'R2' },
+    { headsign: null, routeId: 'R3' },
+  ];
+
+  it('filterDepartures.nonLirr.excludesDeselected', () => {
+    const selected = new Set(['Flushing-Main St']);
+    const result = filterDepartures(nonLirrDeps, {
+      isLirrMode: false,
+      lirrDestinationMode: 'inbound',
+      lirrSelectedHeadsign: null,
+      selectedHeadsigns: selected,
+    });
+    expect(result.some((d) => d.headsign === 'Jamaica')).toBe(false);
+  });
+
+  it('filterDepartures.nonLirr.includesSelected', () => {
+    const selected = new Set(['Flushing-Main St']);
+    const result = filterDepartures(nonLirrDeps, {
+      isLirrMode: false,
+      lirrDestinationMode: 'inbound',
+      lirrSelectedHeadsign: null,
+      selectedHeadsigns: selected,
+    });
+    expect(result.some((d) => d.headsign === 'Flushing-Main St')).toBe(true);
+    // null headsign passes through
+    expect(result.some((d) => d.headsign === null)).toBe(true);
+  });
+
+  const lirrDeps = [
+    { headsign: 'Penn Station', directionId: '1', downstreamStops: ['Greenlawn', 'Penn Station'] },
+    { headsign: 'Penn Station', directionId: '1', downstreamStops: ['Penn Station'] },
+    { headsign: 'Babylon', directionId: '0', downstreamStops: ['Babylon'] },
+    { headsign: 'Ronkonkoma', directionId: '0', downstreamStops: ['Greenlawn', 'Ronkonkoma'] },
+  ];
+
+  it('filterDepartures.lirr.inbound', () => {
+    const result = filterDepartures(lirrDeps, {
+      isLirrMode: true,
+      lirrDestinationMode: 'inbound',
+      lirrSelectedHeadsign: null,
+      selectedHeadsigns: new Set(),
+    });
+    expect(result).toHaveLength(2);
+    result.forEach((d) => expect(d.directionId).toBe('1'));
+  });
+
+  it('filterDepartures.lirr.outbound', () => {
+    const result = filterDepartures(lirrDeps, {
+      isLirrMode: true,
+      lirrDestinationMode: 'outbound',
+      lirrSelectedHeadsign: null,
+      selectedHeadsigns: new Set(),
+    });
+    expect(result).toHaveLength(2);
+    result.forEach((d) => expect(d.directionId).toBe('0'));
+  });
+
+  it('filterDepartures.lirr.specific', () => {
+    const result = filterDepartures(lirrDeps, {
+      isLirrMode: true,
+      lirrDestinationMode: 'specific',
+      lirrSelectedHeadsign: 'Greenlawn',
+      selectedHeadsigns: new Set(),
+    });
+    expect(result).toHaveLength(2);
+    result.forEach((d) => expect(d.downstreamStops).toContain('Greenlawn'));
+  });
+});
+
+describe('timetable.formatHourLabel', () => {
+  it('formatHourLabel 24h pads with zeros', () => {
+    expect(formatHourLabel(5, '24h')).toBe('05');
+    expect(formatHourLabel(25, '24h')).toBe('25');
+  });
+
+  it('formatHourLabel 12h midnight (0) → "12a"', () => {
+    expect(formatHourLabel(0, '12h')).toBe('12a');
+  });
+
+  it('formatHourLabel 12h noon (12) → "12p"', () => {
+    expect(formatHourLabel(12, '12h')).toBe('12p');
+  });
+
+  it('formatHourLabel 12h afternoon (13) → "1p"', () => {
+    expect(formatHourLabel(13, '12h')).toBe('1p');
+  });
+
+  it('formatHourLabel 12h next-day hour (25) → "1a"', () => {
+    expect(formatHourLabel(25, '12h')).toBe('1a');
+  });
+
+  it('formatHourLabel 12h next-day midnight (24) → "12a"', () => {
+    expect(formatHourLabel(24, '12h')).toBe('12a');
   });
 });
 

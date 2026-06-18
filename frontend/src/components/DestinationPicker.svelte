@@ -77,6 +77,12 @@
     border-bottom: 1px solid #e0e0e0;
   }
 
+  @media print {
+    .destination-picker {
+      display: none;
+    }
+  }
+
   .direction-buttons {
     display: flex;
     gap: 8px;
