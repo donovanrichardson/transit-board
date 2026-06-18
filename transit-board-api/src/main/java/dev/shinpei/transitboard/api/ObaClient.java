@@ -19,15 +19,16 @@ import java.time.format.DateTimeFormatter;
 
 public class ObaClient {
 
-    private static final String API_KEY = "TEST";
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     private final String baseUrl;
+    private final String apiKey;
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
 
     public ObaClient(String baseUrl) {
         this.baseUrl = baseUrl;
+        this.apiKey = System.getenv().getOrDefault("OBA_API_KEY", "TEST");
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(10))
                 .build();
@@ -37,30 +38,30 @@ public class ObaClient {
     public ObaResponse fetchSchedule(String stopId, LocalDate date) {
         String encodedStopId = stopId.replace(" ", "%20");
         String url = baseUrl + "/api/where/schedule-for-stop/" + encodedStopId + ".json"
-                + "?key=" + API_KEY + "&date=" + DATE_FMT.format(date);
+                + "?key=" + apiKey + "&date=" + DATE_FMT.format(date);
         return fetchAs(url, ObaResponse.class);
     }
 
     public ObaStopResponse fetchStop(String stopId) {
         String encodedStopId = stopId.replace(" ", "%20");
-        String url = baseUrl + "/api/where/stop/" + encodedStopId + ".json?key=" + API_KEY;
+        String url = baseUrl + "/api/where/stop/" + encodedStopId + ".json?key=" + apiKey;
         return fetchAs(url, ObaStopResponse.class);
     }
 
     public ObaTripResponse fetchTrip(String tripId) {
         String encodedTripId = tripId.replace(" ", "%20");
-        String url = baseUrl + "/api/where/trip/" + encodedTripId + ".json?key=" + API_KEY;
+        String url = baseUrl + "/api/where/trip/" + encodedTripId + ".json?key=" + apiKey;
         return fetchAs(url, ObaTripResponse.class);
     }
 
     public ObaStopsForAgencyResponse fetchStopsForAgency(String agencyId) {
-        String url = baseUrl + "/api/where/stops-for-agency/" + agencyId + ".json?key=" + API_KEY;
+        String url = baseUrl + "/api/where/stops-for-agency/" + agencyId + ".json?key=" + apiKey;
         return fetchAs(url, ObaStopsForAgencyResponse.class);
     }
 
     public ObaTripScheduleResponse fetchTripSchedule(String tripId) {
         String encodedTripId = tripId.replace(" ", "%20");
-        String url = baseUrl + "/api/where/trip-details/" + encodedTripId + ".json?key=" + API_KEY;
+        String url = baseUrl + "/api/where/trip-details/" + encodedTripId + ".json?key=" + apiKey;
         return fetchAs(url, ObaTripScheduleResponse.class);
     }
 

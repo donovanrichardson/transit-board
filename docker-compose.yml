@@ -6,7 +6,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: oba_database
       MYSQL_USER: ${JDBC_USER:-oba}
-      MYSQL_PASSWORD: ${JDBC_PASSWORD:-***REMOVED***}
+      MYSQL_PASSWORD: ${JDBC_PASSWORD}
     volumes:
       - mysql-data:/var/lib/mysql
     restart: always
@@ -30,7 +30,7 @@ services:
       - JDBC_URL=${JDBC_URL:-jdbc:mysql://oba_database:3306/oba_database}
       - JDBC_DRIVER=com.mysql.cj.jdbc.Driver
       - JDBC_USER=${JDBC_USER:-oba}
-      - JDBC_PASSWORD=${JDBC_PASSWORD:-***REMOVED***}
+      - JDBC_PASSWORD=${JDBC_PASSWORD}
       - TEST_API_KEY=${OBA_API_KEY}
     volumes:
       - ./oba-server/bundle:/bundle
@@ -58,6 +58,7 @@ services:
     environment:
       - OBA_BASE_URL=http://oba-app:8080
       - PORT=4000
+      - OBA_API_KEY=${OBA_API_KEY}
     depends_on:
       - oba_app
     restart: always
