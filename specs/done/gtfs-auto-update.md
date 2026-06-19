@@ -7,7 +7,7 @@ Automatically check for LIRR GTFS feed updates daily at 5 AM America/New_York, a
 - The OBA bundler container downloads GTFS from `GTFS_URL` and writes the bundle to `/bundle` (bind-mounted from `./oba-server/bundle/` on the host).
 - The GTFS zip at `https://rrgtfsfeeds.s3.amazonaws.com/gtfslirr.zip` is a stable URL pointing to the latest LIRR feed.
 - Double-downloading the GTFS zip (once for checksum, once by the bundler) is **avoided**: the updater saves the downloaded zip to `/bundle/gtfs_pristine.zip` and passes `GTFS_URL=file:///bundle/gtfs_pristine.zip` when triggering the bundler, eliminating the race condition.
-- The Hetzner VPS has 2 vCPU / 3.7 GB RAM. Bundle builds are memory-intensive; the updater must not run concurrently with a manual bundler run.
+- The VPS has 2 vCPU / 3.7 GB RAM. Bundle builds are memory-intensive; the updater must not run concurrently with a manual bundler run.
 
 ## Scope
 
