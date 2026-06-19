@@ -1,0 +1,39 @@
+{
+  "data": {
+    "entry": {
+      "timeZone": "America/New_York",
+      "stopCalendarDays": [
+        { "date": 1750118400000 }
+      ],
+      "stopRouteSchedules": [
+        {
+          "routeId": "LI_1",
+          "stopRouteDirectionSchedules": [
+            {
+              "tripHeadsign": "Huntington",
+              "scheduleStopTimes": [
+                {
+                  "departureTime": 1750165920000,
+                  "departureEnabled": true,
+                  "stopHeadsign": "",
+                  "tripId": "LI_hp_trip_001"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "references": {
+      "routes": [
+        {
+          "id": "LI_1",
+          "shortName": "Main Line",
+          "color": "009B3A",
+          "textColor": "FFFFFF"
+        }
+      ],
+      "stops": []
+    }
+  }
+}

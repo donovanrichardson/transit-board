@@ -42,5 +42,6 @@ public class ScheduleResponse {
         public String tripId;
         public String directionId;
         public List<String> downstreamStops;
+        public boolean dstRepeat;
     }
 }

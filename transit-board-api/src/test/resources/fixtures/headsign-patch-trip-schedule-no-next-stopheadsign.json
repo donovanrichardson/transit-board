@@ -1,0 +1,21 @@
+{
+  "data": {
+    "entry": {
+      "tripId": "LI_hp_trip_001",
+      "schedule": {
+        "stopTimes": [
+          { "stopId": "LI_hp_200", "stopHeadsign": "" },
+          { "stopId": "LI_hp_201", "stopHeadsign": "" },
+          { "stopId": "LI_hp_202", "stopHeadsign": "" }
+        ]
+      }
+    },
+    "references": {
+      "stops": [
+        { "id": "LI_hp_200", "name": "Mineola" },
+        { "id": "LI_hp_201", "name": "Merillon Avenue" },
+        { "id": "LI_hp_202", "name": "Penn Station" }
+      ]
+    }
+  }
+}

@@ -1,82 +1,108 @@
 <script>
-  import { CITY_TERMINALS } from '../lib/lirr.js';
+  import { CITY_TERMINALS, HEADSIGN_ABBREVIATIONS } from '../lib/lirr.js';
 
   export let stop = null;
   export let departures = [];
   export let isLirrMode = false;
+  export let lirrDestinationMode = 'inbound';
+  export let lirrSelectedHeadsign = null;
+  export let headsignAbbrevVisibility = null;
 
-  /**
-   * Computes the pill background/text color for a given headsign.
-   * In LIRR mode: applies 2/3 dominance threshold.
-   * In non-LIRR mode: plurality pick (unchanged).
-   */
-  function headsignColor(headsign) {
-    const counts = {};
+  // 3-step cascade over all departures to pick the underline color.
+  $: lineColor = (() => {
+    const byColor = {};
     for (const d of departures) {
-      if (d.headsign === headsign) {
-        const id = d.routeId;
-        if (!counts[id]) counts[id] = { count: 0, color: d.routeColor, textColor: d.routeTextColor };
-        counts[id].count++;
-      }
+      const key = (d.routeColor || '').toUpperCase() || 'NONE';
+      if (!byColor[key]) byColor[key] = { count: 0, color: d.routeColor };
+      byColor[key].count++;
+    }
+    const total = Object.values(byColor).reduce((s, v) => s + v.count, 0);
+    if (total === 0) return '#666666';
+
+    let topKey = null, topCount = 0;
+    for (const [key, v] of Object.entries(byColor)) {
+      if (v.count > topCount) { topCount = v.count; topKey = key; }
     }
 
     if (isLirrMode) {
-      const total = Object.values(counts).reduce((s, v) => s + v.count, 0);
-      if (total === 0) return { bg: '#666666', text: '#FFFFFF' };
-
-      let topId = null;
-      let topCount = 0;
-      for (const [id, v] of Object.entries(counts)) {
-        if (v.count > topCount) {
-          topCount = v.count;
-          topId = id;
-        }
+      if (topCount > (2 / 3) * total && byColor[topKey].color) {
+        return '#' + byColor[topKey].color;
       }
-
-      if (topCount > (2 / 3) * total) {
-        const best = counts[topId];
-        if (best && best.color) {
-          return { bg: '#' + best.color, text: '#' + (best.textColor || 'FFFFFF') };
-        }
-      }
-
-      const cityTerminalCount = departures.filter(
-        (d) => d.headsign === headsign && CITY_TERMINALS.includes(d.headsign)
-      ).length;
-      if (cityTerminalCount >= (2 / 3) * total) {
-        return { bg: '#4D5357', text: '#FFFFFF' };
-      }
-
-      return { bg: '#0039A6', text: '#FFFFFF' };
+      const cityCount = departures.filter((d) => CITY_TERMINALS.includes(d.headsign)).length;
+      if (cityCount >= (2 / 3) * total) return '#4D5357';
+      return '#0039A6';
     }
 
-    // Non-LIRR: plurality pick
-    let max = 0;
-    let best = null;
-    for (const v of Object.values(counts)) {
-      if (v.count > max) {
-        max = v.count;
-        best = v;
-      }
-    }
-    if (!best || !best.color) {
-      return { bg: '#666666', text: '#FFFFFF' };
-    }
-    return { bg: '#' + best.color, text: '#' + (best.textColor || 'FFFFFF') };
-  }
+    return byColor[topKey] && byColor[topKey].color ? '#' + byColor[topKey].color : '#666666';
+  })();
 
-  $: hasDirection = !isLirrMode && stop && stop.direction;
   $: hasSiblings = !isLirrMode && stop && stop.siblingStopIds && stop.siblingStopIds.length > 0;
   $: stopTitle = stop
     ? ((!isLirrMode && stop.direction) ? `${stop.name} (${stop.direction})` : stop.name)
     : 'Loading…';
 
-  $: visibleHeadsigns = hasDirection
-    ? []
-    : [...new Set(departures.map((d) => d.headsign).filter(Boolean))];
+  function headsignColor(headsign) {
+    const byColor = {};
+    for (const d of departures) {
+      if (d.headsign === headsign) {
+        const key = (d.routeColor || '').toUpperCase() || 'NONE';
+        if (!byColor[key]) byColor[key] = { count: 0, color: d.routeColor, textColor: d.routeTextColor };
+        byColor[key].count++;
+      }
+    }
+    if (isLirrMode) {
+      const total = Object.values(byColor).reduce((s, v) => s + v.count, 0);
+      if (total === 0) return { bg: '#666666', text: '#FFFFFF' };
+      let topKey = null, topCount = 0;
+      for (const [key, v] of Object.entries(byColor)) {
+        if (v.count > topCount) { topCount = v.count; topKey = key; }
+      }
+      if (topCount > (2 / 3) * total && byColor[topKey].color) {
+        return { bg: '#' + byColor[topKey].color, text: '#' + (byColor[topKey].textColor || 'FFFFFF') };
+      }
+      const cityCount = departures.filter((d) => d.headsign === headsign && CITY_TERMINALS.includes(d.headsign)).length;
+      if (cityCount >= (2 / 3) * total) return { bg: '#4D5357', text: '#FFFFFF' };
+      return { bg: '#0039A6', text: '#FFFFFF' };
+    }
+    let max = 0, best = null;
+    for (const v of Object.values(byColor)) {
+      if (v.count > max) { max = v.count; best = v; }
+    }
+    if (!best || !best.color) return { bg: '#666666', text: '#FFFFFF' };
+    return { bg: '#' + best.color, text: '#' + (best.textColor || 'FFFFFF') };
+  }
+
+  $: hasDirection = !isLirrMode && stop && stop.direction;
+  function effectiveAbbr(headsign) {
+    if (headsignAbbrevVisibility === null) return HEADSIGN_ABBREVIATIONS[headsign] || null;
+    return headsignAbbrevVisibility[headsign] ? HEADSIGN_ABBREVIATIONS[headsign] : null;
+  }
+
+  $: visibleHeadsigns = (() => {
+    if (hasDirection) return [];
+    const unique = [...new Set(departures.map((d) => d.headsign).filter(Boolean))];
+    return unique.slice().sort((a, b) => {
+      const abbrA = effectiveAbbr(a);
+      const abbrB = effectiveAbbr(b);
+      if (!abbrA && !abbrB) return 0;
+      if (!abbrA) return -1;
+      if (!abbrB) return 1;
+      return abbrA < abbrB ? -1 : abbrA > abbrB ? 1 : 0;
+    });
+  })();
+
+  $: directionLabelText = (() => {
+    if (lirrDestinationMode === 'specific' && lirrSelectedHeadsign) {
+      return `to ${lirrSelectedHeadsign}`;
+    }
+    if (lirrDestinationMode === 'outbound') {
+      return 'Outbound';
+    }
+    return 'Inbound';
+  })();
 </script>
 
-<header class="timetable-header">
+<header class="timetable-header" style="border-bottom: 4px solid {lineColor};">
   <div class="header-top">
     <h1 class="stop-name">{stopTitle}</h1>
     {#if hasSiblings}
@@ -86,27 +112,38 @@
         </a>
       {/each}
     {/if}
+    {#if isLirrMode}
+      <span class="direction-label">{directionLabelText}</span>
+    {/if}
   </div>
+</header>
 
-  {#if !hasDirection && visibleHeadsigns.length > 0}
-    <div class="headsign-pills">
+{#if !hasDirection && visibleHeadsigns.length > 0}
+  <div class="headsign-pills">
+    <p class="pills-label">Trips toward</p>
+    <div class="pills-row">
       {#each visibleHeadsigns as headsign}
         {@const colors = headsignColor(headsign)}
-        <span
-          class="headsign-pill"
-          style="background-color: {colors.bg}; color: {colors.text};"
-        >
-          {headsign}
-        </span>
+        {@const abbr = effectiveAbbr(headsign) || null}
+        <div class="pill-entry">
+          {#if visibleHeadsigns.length > 1}
+            <div class="pill-abbreviation">{abbr ?? 'Unlabeled'}</div>
+          {/if}
+          <span
+            class="headsign-pill"
+            style="background-color: {colors.bg}; color: {colors.text};"
+          >
+            {headsign}
+          </span>
+        </div>
       {/each}
     </div>
-  {/if}
-</header>
+  </div>
+{/if}
 
 <style>
   .timetable-header {
     padding: 12px 16px;
-    border-bottom: 1px solid #e0e0e0;
   }
 
   .header-top {
@@ -137,11 +174,47 @@
     background: #002d8c;
   }
 
+  .direction-label {
+    margin-left: auto;
+    font-size: 1.1rem;
+    font-weight: 500;
+    white-space: nowrap;
+    color: #333;
+  }
+
   .headsign-pills {
+    padding: 8px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .pills-label {
+    margin: 0 0 6px 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .pills-row {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    margin-top: 8px;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .pill-entry {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .pill-abbreviation {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 2px;
   }
 
   .headsign-pill {

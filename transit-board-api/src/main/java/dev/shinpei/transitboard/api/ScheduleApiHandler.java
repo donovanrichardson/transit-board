@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import dev.shinpei.transitboard.model.Departure;
+import dev.shinpei.transitboard.model.ObaAgencyResponse;
 import dev.shinpei.transitboard.model.ObaResponse;
 import dev.shinpei.transitboard.model.ObaStopResponse;
 import dev.shinpei.transitboard.model.ObaTripResponse;
@@ -96,8 +97,20 @@ public class ScheduleApiHandler implements HttpHandler {
         // Fetch schedule
         ObaResponse scheduleOba = obaClient.fetchSchedule(stopId, scheduleDate);
 
-        String timeZone = scheduleOba.data.entry.timeZone;
-        ZoneId zone = ZoneId.of(timeZone != null ? timeZone : "UTC");
+        // Resolve timezone from agency (schedule response does not include timeZone)
+        String timeZone;
+        if (scheduleOba.data.references != null && scheduleOba.data.references.routes != null
+                && !scheduleOba.data.references.routes.isEmpty()) {
+            String firstRouteId = scheduleOba.data.references.routes.get(0).id;
+            String agencyId = firstRouteId.contains("_")
+                    ? firstRouteId.split("_", 2)[0]
+                    : firstRouteId;
+            ObaAgencyResponse agencyResponse = obaClient.fetchAgency(agencyId);
+            timeZone = agencyResponse.data.entry.timezone;
+        } else {
+            timeZone = "America/New_York";
+        }
+        ZoneId zone = ZoneId.of(timeZone);
 
         // Fetch stop metadata
         ObaStopResponse stopOba = obaClient.fetchStop(stopId);
@@ -135,6 +148,14 @@ public class ScheduleApiHandler implements HttpHandler {
                         ObaTripResponse tripResponse = obaClient.fetchTrip(tid);
                         if (tripResponse != null && tripResponse.data != null
                                 && tripResponse.data.entry != null) {
+                            String fetchedHeadsign = tripResponse.data.entry.tripHeadsign;
+                            if (fetchedHeadsign != null && !fetchedHeadsign.isEmpty()) {
+                                for (Departure dep : departures) {
+                                    if (tid.equals(dep.getTripId())) {
+                                        dep.setHeadsign(fetchedHeadsign);
+                                    }
+                                }
+                            }
                             return tripResponse.data.entry.directionId;
                         }
                     } catch (Exception ignored) {
@@ -215,11 +236,13 @@ public class ScheduleApiHandler implements HttpHandler {
         // Build departure list
         List<ScheduleResponse.DepartureInfo> departureInfos = new ArrayList<>();
         for (Departure d : departures) {
-            int[] hourMinute = HourCalculator.compute(d.getDepartureTime().toEpochMilli(), scheduleDate, zone);
+            long epochMs = d.getDepartureTime().toEpochMilli();
+            int[] hourMinute = HourCalculator.compute(epochMs, scheduleDate, zone);
             ScheduleResponse.DepartureInfo di = new ScheduleResponse.DepartureInfo();
-            di.departureEpochMs = d.getDepartureTime().toEpochMilli();
+            di.departureEpochMs = epochMs;
             di.hour = hourMinute[0];
             di.minute = hourMinute[1];
+            di.dstRepeat = HourCalculator.isDstRepeat(epochMs, zone);
             di.routeId = d.getRouteId();
             di.routeShortName = d.getRouteShortName();
             di.routeColor = d.getRouteColor();

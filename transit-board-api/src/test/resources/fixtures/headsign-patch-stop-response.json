@@ -1,0 +1,14 @@
+{
+  "data": {
+    "entry": {
+      "id": "LI_hp_200",
+      "name": "Mineola",
+      "direction": null,
+      "parent": null
+    },
+    "references": {
+      "routes": [],
+      "stops": []
+    }
+  }
+}

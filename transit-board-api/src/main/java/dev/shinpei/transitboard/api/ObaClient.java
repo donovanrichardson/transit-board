@@ -1,6 +1,7 @@
 package dev.shinpei.transitboard.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.shinpei.transitboard.model.ObaAgencyResponse;
 import dev.shinpei.transitboard.model.ObaResponse;
 import dev.shinpei.transitboard.model.ObaStopResponse;
 import dev.shinpei.transitboard.model.ObaStopsForAgencyResponse;
@@ -63,6 +64,11 @@ public class ObaClient {
         String encodedTripId = tripId.replace(" ", "%20");
         String url = baseUrl + "/api/where/trip-details/" + encodedTripId + ".json?key=" + apiKey;
         return fetchAs(url, ObaTripScheduleResponse.class);
+    }
+
+    public ObaAgencyResponse fetchAgency(String agencyId) {
+        String url = baseUrl + "/api/where/agency/" + agencyId + ".json?key=" + apiKey;
+        return fetchAs(url, ObaAgencyResponse.class);
     }
 
     private <T> T fetchAs(String url, Class<T> type) {

@@ -1,0 +1,9 @@
+{
+  "data": {
+    "entry": {
+      "id": "MTA_NYCT",
+      "name": "MTA New York City Transit",
+      "timezone": "America/New_York"
+    }
+  }
+}

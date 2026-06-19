@@ -3,7 +3,9 @@ package dev.shinpei.transitboard.api;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 public class HourCalculator {
 
@@ -27,5 +29,16 @@ public class HourCalculator {
         }
 
         return new int[]{hour, minute};
+    }
+
+    /**
+     * Returns true if the given epoch millisecond falls in the second repetition of a
+     * DST fall-back overlap in the given timezone (i.e. the clock has already fallen back
+     * and this local time is being repeated in standard time).
+     */
+    public static boolean isDstRepeat(long epochMs, ZoneId zone) {
+        ZonedDateTime zdt = Instant.ofEpochMilli(epochMs).atZone(zone);
+        List<ZoneOffset> validOffsets = zone.getRules().getValidOffsets(zdt.toLocalDateTime());
+        return validOffsets.size() == 2 && zdt.getOffset().equals(validOffsets.get(1));
     }
 }

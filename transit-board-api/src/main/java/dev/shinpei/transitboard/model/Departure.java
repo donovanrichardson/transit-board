@@ -5,7 +5,7 @@ import java.time.Instant;
 public class Departure {
     private final String routeId;
     private final String routeShortName;
-    private final String headsign;
+    private String headsign;
     private final Instant departureTime;
     private final String routeColor;
     private final String routeTextColor;
@@ -71,5 +71,9 @@ public class Departure {
 
     public void setDirectionId(String directionId) {
         this.directionId = directionId;
+    }
+
+    public void setHeadsign(String headsign) {
+        this.headsign = headsign;
     }
 }

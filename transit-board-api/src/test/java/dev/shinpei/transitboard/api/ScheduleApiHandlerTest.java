@@ -36,6 +36,7 @@ class ScheduleApiHandlerTest {
         String scheduleJson = loadFixture("fixtures/schedule-response.json");
         String stopJson = loadFixture("fixtures/stop-response.json");
         String parentStopJson = loadFixture("fixtures/parent-stop-response.json");
+        String agencyJson = loadFixture("fixtures/agency-mta-response.json");
 
         mockObaServer.createContext("/api/where/schedule-for-stop/", exchange -> {
             byte[] body = scheduleJson.getBytes(StandardCharsets.UTF_8);
@@ -55,6 +56,14 @@ class ScheduleApiHandlerTest {
 
         mockObaServer.createContext("/api/where/stop/MTA_NYCT_725.json", exchange -> {
             byte[] body = parentStopJson.getBytes(StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().set("Content-Type", "application/json");
+            exchange.sendResponseHeaders(200, body.length);
+            exchange.getResponseBody().write(body);
+            exchange.close();
+        });
+
+        mockObaServer.createContext("/api/where/agency/MTA.json", exchange -> {
+            byte[] body = agencyJson.getBytes(StandardCharsets.UTF_8);
             exchange.getResponseHeaders().set("Content-Type", "application/json");
             exchange.sendResponseHeaders(200, body.length);
             exchange.getResponseBody().write(body);

@@ -12,7 +12,7 @@
 
 <div class="home-page">
   <header class="home-header">
-    <h1 class="home-title">Transit Board</h1>
+    <h1 class="home-title">LIRR Departure Board</h1>
     <p class="home-subtitle">Select your origin station</p>
   </header>
 
@@ -51,6 +51,7 @@
 
   .home-header {
     margin-bottom: 24px;
+    text-align: center;
   }
 
   .home-title {

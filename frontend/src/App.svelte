@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { fetchSchedule, fetchStops } from './lib/api.js';
   import { isLirr } from './lib/lirr.js';
-  import { filterDepartures } from './lib/timetable.js';
+  import { filterDepartures, computeHeadsignAbbreviationVisibility } from './lib/timetable.js';
   import Header from './components/Header.svelte';
   import DatePicker from './components/DatePicker.svelte';
   import HeadsignFilter from './components/HeadsignFilter.svelte';
@@ -64,6 +64,7 @@
   $: stop = data ? data.stop : null;
 
   $: filteredDepartures = filterDepartures(departures, { isLirrMode: lirrMode, lirrDestinationMode, lirrSelectedHeadsign, selectedHeadsigns });
+  $: headsignAbbrevVisibility = computeHeadsignAbbreviationVisibility(filteredDepartures);
 
   // Home page state
   let homeLoading = false;
@@ -165,10 +166,14 @@
       error={homeError}
     />
   {:else if stopId}
+    <h1 class="board-title">LIRR Departure Board</h1>
     <Header
       {stop}
       departures={filteredDepartures}
       isLirrMode={lirrMode}
+      {lirrDestinationMode}
+      {lirrSelectedHeadsign}
+      {headsignAbbrevVisibility}
     />
 
     <div class="print-date">
@@ -224,14 +229,25 @@
 
   :global(body) {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: Helvetica, Arial, sans-serif;
     color: #000;
     background: #fff;
+  }
+
+  :global(#schedule-date) {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
   .app {
     max-width: 960px;
     margin: 0 auto;
+  }
+
+  .board-title {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 16px 0 8px;
   }
 
   .error-message {

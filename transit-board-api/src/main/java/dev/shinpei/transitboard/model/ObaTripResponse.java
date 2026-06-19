@@ -16,5 +16,6 @@ public class ObaTripResponse {
         public String id;
         public String directionId;
         public String routeId;
+        public String tripHeadsign;
     }
 }

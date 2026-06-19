@@ -7,11 +7,14 @@
 </script>
 
 <div class="minute-cell" class:lirr={isLirrMode}>
-  <span class="minute-value">{String(departure.minute).padStart(2, '0')}</span>
+  <span class="minute-value" style={departure.dstRepeat ? 'color: red' : ''}>{String(departure.minute).padStart(2, '0')}</span>
   <span class="icon-area">
     {#if isLirrMode}
       {#if showAbbreviation && abbreviation}
-        <span class="headsign-abbr">{abbreviation}</span>
+        <span
+          class="headsign-abbr"
+          style="background-color: #{departure.routeColor || '999'}; color: #{departure.routeTextColor || 'FFF'};"
+        >{abbreviation}</span>
       {:else}
         <span class="icon-placeholder"></span>
       {/if}
@@ -34,6 +37,7 @@
     display: inline-flex;
     flex-direction: column;
     align-items: center;
+    align-self: stretch;
     width: 40px;
     min-width: 40px;
     padding: 2px 1px;
@@ -52,10 +56,11 @@
   }
 
   .icon-area {
-    height: 14px;
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
   }
 
   .route-icon {
@@ -77,9 +82,13 @@
   }
 
   .headsign-abbr {
+    display: block;
+    width: 100%;
+    height: 100%;
     font-size: 0.45rem;
     font-weight: 700;
-    line-height: 1;
-    color: #333;
+    line-height: 14px;
+    text-align: center;
+    border-radius: 2px;
   }
 </style>

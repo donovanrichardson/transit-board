@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,5 +46,37 @@ class HourCalculatorTest {
         int[] result = HourCalculator.compute(epochMs, SCHEDULE_DATE, NY);
         assertEquals(24, result[0], "hour should be 24 (exact midnight next day)");
         assertEquals(0, result[1], "minute should be 0");
+    }
+
+    @Test
+    void isDstRepeat_normalDay_returnsFalse() {
+        // 14:30 on 2026-06-14 in America/New_York — normal summer day, no DST overlap
+        long epochMs = ZonedDateTime.of(2026, 6, 14, 14, 30, 0, 0, NY)
+                .toInstant().toEpochMilli();
+        assertFalse(HourCalculator.isDstRepeat(epochMs, NY));
+    }
+
+    @Test
+    void isDstRepeat_springForwardGap_returnsFalse() {
+        // 03:00 on 2026-03-08 in America/New_York — spring-forward gap (skipped hour)
+        long epochMs = ZonedDateTime.of(2026, 3, 8, 3, 0, 0, 0, NY)
+                .toInstant().toEpochMilli();
+        assertFalse(HourCalculator.isDstRepeat(epochMs, NY));
+    }
+
+    @Test
+    void isDstRepeat_fallBackFirstRepetition_returnsFalse() {
+        // 01:30 EDT (-04:00) on 2026-11-01 — first repetition of the overlap hour
+        long epochMs = ZonedDateTime.of(2026, 11, 1, 1, 30, 0, 0, ZoneOffset.ofHours(-4))
+                .toInstant().toEpochMilli();
+        assertFalse(HourCalculator.isDstRepeat(epochMs, NY));
+    }
+
+    @Test
+    void isDstRepeat_fallBackSecondRepetition_returnsTrue() {
+        // 01:30 EST (-05:00) on 2026-11-01 — second repetition of the overlap hour
+        long epochMs = ZonedDateTime.of(2026, 11, 1, 1, 30, 0, 0, ZoneOffset.ofHours(-5))
+                .toInstant().toEpochMilli();
+        assertTrue(HourCalculator.isDstRepeat(epochMs, NY));
     }
 }

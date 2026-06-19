@@ -41,6 +41,8 @@ class ScheduleApiHandlerLirrTest {
         String subwayScheduleJson = loadFixture("fixtures/schedule-response.json");
         String subwayStopJson = loadFixture("fixtures/stop-response.json");
         String subwayParentStopJson = loadFixture("fixtures/parent-stop-response.json");
+        String lirrAgencyJson = loadFixture("fixtures/agency-li-response.json");
+        String subwayAgencyJson = loadFixture("fixtures/agency-mta-response.json");
 
         mockObaServer.createContext("/api/where/schedule-for-stop/LI_102.json", exchange -> {
             byte[] body = lirrScheduleJson.getBytes(StandardCharsets.UTF_8);
@@ -92,6 +94,22 @@ class ScheduleApiHandlerLirrTest {
 
         mockObaServer.createContext("/api/where/stop/MTA_NYCT_725.json", exchange -> {
             byte[] body = subwayParentStopJson.getBytes(StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().set("Content-Type", "application/json");
+            exchange.sendResponseHeaders(200, body.length);
+            exchange.getResponseBody().write(body);
+            exchange.close();
+        });
+
+        mockObaServer.createContext("/api/where/agency/LI.json", exchange -> {
+            byte[] body = lirrAgencyJson.getBytes(StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().set("Content-Type", "application/json");
+            exchange.sendResponseHeaders(200, body.length);
+            exchange.getResponseBody().write(body);
+            exchange.close();
+        });
+
+        mockObaServer.createContext("/api/where/agency/MTA.json", exchange -> {
+            byte[] body = subwayAgencyJson.getBytes(StandardCharsets.UTF_8);
             exchange.getResponseHeaders().set("Content-Type", "application/json");
             exchange.sendResponseHeaders(200, body.length);
             exchange.getResponseBody().write(body);
@@ -233,6 +251,7 @@ class ScheduleApiHandlerLirrTest {
             String lirrScheduleJson = loadFixture("fixtures/lirr-schedule-response.json");
             String lirrStopJson = loadFixture("fixtures/lirr-stop-response.json");
             String lirrTripJson = loadFixture("fixtures/lirr-trip-001-response.json");
+            String lirrAgencyJson = loadFixture("fixtures/agency-li-response.json");
 
             failServer.createContext("/api/where/schedule-for-stop/LI_102.json", exchange -> {
                 byte[] body = lirrScheduleJson.getBytes(StandardCharsets.UTF_8);
@@ -257,6 +276,13 @@ class ScheduleApiHandlerLirrTest {
             });
             failServer.createContext("/api/where/trip-details/LI_trip_001.json", exchange -> {
                 exchange.sendResponseHeaders(500, 0);
+                exchange.close();
+            });
+            failServer.createContext("/api/where/agency/LI.json", exchange -> {
+                byte[] body = lirrAgencyJson.getBytes(StandardCharsets.UTF_8);
+                exchange.getResponseHeaders().set("Content-Type", "application/json");
+                exchange.sendResponseHeaders(200, body.length);
+                exchange.getResponseBody().write(body);
                 exchange.close();
             });
             failServer.start();

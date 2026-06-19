@@ -104,6 +104,7 @@
     border-collapse: collapse;
     width: 100%;
     min-width: 400px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
   .timetable-row {

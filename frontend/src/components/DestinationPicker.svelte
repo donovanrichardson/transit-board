@@ -21,12 +21,14 @@
   function selectDirection(dir) {
     directionMode = dir;
     selectedHeadsign = null;
+    searchText = '';
     dispatch('change', { mode: dir, headsign: null });
   }
 
   function selectHeadsign(h) {
     directionMode = null;
     selectedHeadsign = h;
+    searchText = '';
     dispatch('change', { mode: 'specific', headsign: h });
   }
 </script>
@@ -38,14 +40,14 @@
       class:active={directionMode === 'inbound'}
       on:click={() => selectDirection('inbound')}
     >
-      All Inbound
+      Inbound
     </button>
     <button
       class="direction-btn"
       class:active={directionMode === 'outbound'}
       on:click={() => selectDirection('outbound')}
     >
-      All Outbound
+      Outbound
     </button>
   </div>
 
@@ -56,18 +58,16 @@
       bind:value={searchText}
       on:input
     />
-  </div>
-
-  <div class="destination-list">
-    {#each filteredHeadsigns as headsign}
-      <button
-        class="destination-btn"
-        class:active={selectedHeadsign === headsign}
-        on:click={() => selectHeadsign(headsign)}
-      >
-        {headsign}
-      </button>
-    {/each}
+    {#if searchText}
+      <div class="destination-dropdown">
+        {#if filteredHeadsigns.length === 0}
+          <div class="dropdown-empty">No results</div>
+        {/if}
+        {#each filteredHeadsigns as headsign}
+          <button class="dropdown-item" on:click={() => selectHeadsign(headsign)}>{headsign}</button>
+        {/each}
+      </div>
+    {/if}
   </div>
 </div>
 
@@ -89,8 +89,7 @@
     margin-bottom: 8px;
   }
 
-  .direction-btn,
-  .destination-btn {
+  .direction-btn {
     padding: 4px 12px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -99,8 +98,7 @@
     font-size: 0.85rem;
   }
 
-  .direction-btn.active,
-  .destination-btn.active {
+  .direction-btn.active {
     background: #0039a6;
     color: #fff;
     border-color: #0039a6;
@@ -108,6 +106,7 @@
 
   .destination-search {
     margin-bottom: 8px;
+    position: relative;
   }
 
   .destination-search input {
@@ -118,9 +117,36 @@
     border-radius: 4px;
   }
 
-  .destination-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+  .destination-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  }
+
+  .dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 6px 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-align: left;
+  }
+
+  .dropdown-item:hover {
+    background: #f0f4ff;
+  }
+
+  .dropdown-empty {
+    padding: 6px 10px;
+    font-size: 0.9rem;
+    color: #999;
   }
 </style>
