@@ -1,6 +1,6 @@
-# Transit Board
+# LIRR Departure Board
 
-A self-hosted transit departure board powered by [OneBusAway](https://onebusaway.org/). Point it at any GTFS feed and query departure schedules for any stop from the command line.
+A self-hosted departure board for the Long Island Rail Road, powered by [OneBusAway](https://onebusaway.org/). Displays a Japanese-style timetable grid with per-trip headsigns derived from GTFS ground truth, colored route pills, and a searchable station picker.
 
 ---
 
@@ -98,9 +98,16 @@ docker compose up oba_app
 ```
 
 **Web timetable** (frontend + API + OBA):
+
+`transit-board-api` requires `OBA_API_KEY` injected at launch — it is not stored in `.env`:
+
 ```bash
-docker compose up oba_app transit-board-api frontend
+docker compose up -d oba_app frontend
+OBA_API_KEY=<your-oba-api-key> docker compose up -d transit-board-api
+docker restart transit-board-frontend-1
 ```
+
+The final `docker restart` is required so Nginx re-resolves the `transit-board-api` DNS after the container is recreated.
 
 Verify OBA is ready:
 ```bash
@@ -109,6 +116,8 @@ curl "http://localhost:8080/api/where/current-time.json?key=TEST"
 ```
 
 OBA loads the full transit bundle into memory at startup. Wait until the `oba_app` logs show Tomcat started before the frontend will return real data.
+
+> **After any rebuild** of any service, always re-run the `OBA_API_KEY=... docker compose up -d transit-board-api` and `docker restart transit-board-frontend-1` steps. `docker compose up --build` cascades restarts that wipe injected env vars.
 
 ---
 
@@ -126,9 +135,17 @@ Replace `<stopId>` with a full OBA stop ID (agency-prefixed), e.g.:
 http://localhost:5173/stop/MTA%20NYCT_725S
 ```
 
-The timetable shows a Japanese-style hour/minute grid for the stop's full day schedule. Use the date picker to view past or future dates. Use the headsign filter (shown when the stop has no direction in the GTFS data) to filter by destination.
+The timetable shows a Japanese-style hour/minute grid. Each cell contains the departure minute and a colored bar indicating the trip's destination. Headsigns are derived per-trip from the GTFS `trip_headsign` field (via the OBA `/trip` endpoint), bypassing OBA's majority-vote grouping which produces incorrect labels at origin stops.
 
-To navigate between platforms at a station (e.g. northbound ↔ southbound), use the direction toggle in the header — it appears automatically when the stop has a sibling platform.
+**Features:**
+- Searchable station picker on the home screen
+- Colored `.timetable-header` border using dominant route color
+- "Trips toward" pill row showing all headsign destinations with abbreviations
+- Inbound/Outbound direction toggle and specific destination search
+- Date picker for past/future schedules
+- Clock toggle between 12h and 24h
+
+To navigate between platforms at a station (e.g. inbound ↔ outbound), use the direction controls in the header.
 
 **Architecture:** the frontend (`http://localhost:5173`) is served by Nginx, which proxies `/api/*` requests to `transit-board-api` (port 4000 internal). `transit-board-api` talks to `oba_app` over the Docker network. You never need to call port 4000 directly.
 
