@@ -72,12 +72,6 @@ services:
     depends_on:
       - transit-board-api
     restart: always
-    labels:
-      caddy: board.example.com
-      caddy.reverse_proxy: "transit-board-frontend-1:80"
-    networks:
-      - default
-      - proxy-net
 
   gtfs_updater:
     build: ./gtfs-updater
@@ -111,6 +105,3 @@ volumes:
 
 networks:
   default: {}
-  proxy-net:
-    external: true
-    name: external-proxy-net

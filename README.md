@@ -99,7 +99,7 @@ docker compose up oba_app
 
 **Web timetable** (frontend + API + OBA):
 
-`transit-board-api` requires `OBA_API_KEY` injected at launch — it is not stored in `.env`:
+`transit-board-api` requires `OBA_API_KEY` set in your environment at launch — it is not stored in `.env`:
 
 ```bash
 docker compose up -d oba_app frontend
@@ -117,7 +117,7 @@ curl "http://localhost:8080/api/where/current-time.json?key=TEST"
 
 OBA loads the full transit bundle into memory at startup. Wait until the `oba_app` logs show Tomcat started before the frontend will return real data.
 
-> **After any rebuild** of any service, always re-run the `OBA_API_KEY=... docker compose up -d transit-board-api` and `docker restart transit-board-frontend-1` steps. `docker compose up --build` cascades restarts that wipe injected env vars.
+> **After any rebuild** of any service, always re-run the `OBA_API_KEY=<your-oba-api-key> docker compose up -d transit-board-api` and `docker restart transit-board-frontend-1` steps. `docker compose up --build` cascades restarts that wipe injected env vars.
 
 ---
 
@@ -201,6 +201,6 @@ GTFS feeds expire on a schedule set by each agency (weekly, monthly, or ad hoc).
 | `GTFS_URL` | — | **Required.** URL of your agency's GTFS zip |
 | `JDBC_URL` | `jdbc:mysql://oba_database:3306/oba_database` | Database connection string |
 | `JDBC_USER` | `oba` | Database user |
-| `JDBC_PASSWORD` | `***REMOVED***` | Database password |
+| `JDBC_PASSWORD` | | Database password (must match `MYSQL_PASSWORD` in `.env`) |
 | `OBA_BASE_URL` | `http://localhost:8080` | OBA server URL (used by CLI and transit-board-api) |
 | `PORT` | `4000` | Port transit-board-api listens on (internal Docker network only) |

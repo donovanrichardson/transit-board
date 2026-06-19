@@ -2,7 +2,7 @@
 
 ## Network metrics unreliable (net_rx_mb / net_tx_mb always 0.0)
 
-The `/proc/net/dev` parser is likely not matching the actual network interface name on this Hetzner box (probably `eth0`, `ens3`, or similar). The interface may be getting filtered out or the line format isn't being parsed correctly. Fix this before relying on network numbers.
+The `/proc/net/dev` parser is likely not matching the actual network interface name on this VPS (probably `eth0`, `ens3`, or similar). The interface may be getting filtered out or the line format isn't being parsed correctly. Fix this before relying on network numbers.
 
 **Priority:** Low — RAM and disk are the metrics that matter for OBA monitoring.
 
