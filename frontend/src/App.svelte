@@ -178,6 +178,12 @@
 
 <div class="app">
   {#if onHome}
+    <div class="controls-row home-controls-row">
+      <div class="lang-toggle">
+        <button class:active={lang === 'en'} on:click={() => setLang('en')}>EN</button>
+        <button class:active={lang === 'ja'} on:click={() => setLang('ja')}>日本語</button>
+      </div>
+    </div>
     <HomePage
       stops={homeStops}
       loading={homeLoading}
