@@ -122,7 +122,27 @@ OBA loads the full transit bundle into memory at startup. Wait until the `oba_ap
 > **Frontend rebuild gotchas:**
 > - Use `docker compose build --no-cache frontend` (not `docker compose build`) — Docker layer caching can serve a stale image even when source files changed.
 > - Use `docker compose up -d frontend` (not `docker restart transit-board-frontend-1`) to actually swap to the new image — `docker restart` only restarts the existing container with the old image.
-> - If `docker compose up` fails with `network external-proxy-net not found`, run `docker network create external-proxy-net` first. This network is normally created by the reverse proxy stack and persists across reboots, but may need manual creation after a full teardown.
+> - If `docker compose up` fails with `network external-proxy-net not found`, **do NOT run `docker network create external-proxy-net`**. `external-proxy-net` is a scrubbed placeholder in git history — the real network is deployment-specific and lives in `docker-compose.override.yml` (gitignored). Check that file's `name:` field and ensure that network exists. Creating a bare `external-proxy-net` will start the container but break Caddy routing.
+> - **`docker compose up -d frontend` can silently recreate `oba_app` and `oba_database`** if the compose file lists them on the same network that was just created. Always pass the service name explicitly (`docker compose up -d frontend`) and check `docker ps` afterwards to confirm OBA containers were not recreated.
+
+> **OBA "Could not load stations" after container recreation:**
+> If `oba_app` and `oba_database` are both recreated simultaneously, OBA will fail to start with `SEVERE: Context startup failed` and the Tomcat log (`docker exec oba_app cat /usr/local/tomcat/logs/localhost.$(date +%Y-%m-%d).log`) will show:
+> ```
+> Caused by: java.sql.SQLException: Access denied for user 'oba'@'<ip>' (using password: YES)
+> ```
+> **Root cause:** MySQL 8.4 uses `caching_sha2_password`. On a cold-cache reconnect (both containers fresh), the auth cache is stale and the older JDBC driver in the OBA image cannot complete the RSA key exchange.
+>
+> **Fix:** Reset the OBA database user's password (forces a fresh cache entry), then restart `oba_app`:
+> ```bash
+> # Get the JDBC_PASSWORD value from your .env first
+> source .env
+> docker exec oba_database mysql -u root -p"${MYSQL_ROOT_PASSWORD}" \
+>   -e "ALTER USER 'oba'@'%' IDENTIFIED BY '${JDBC_PASSWORD}'; FLUSH PRIVILEGES;"
+> docker restart oba_app
+> # Wait ~30s then verify:
+> curl "http://localhost:8080/api/where/current-time.json?key=TEST"
+> ```
+> This fix is idempotent (same password, just forces cache rebuild) and safe to run any time OBA shows access denied.
 
 ---
 
