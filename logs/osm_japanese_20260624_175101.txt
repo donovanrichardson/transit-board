@@ -1,0 +1,21 @@
+────────────────────────────────────────────────────────────────────────
+  OSM Japanese-name audit  —  "Penn Station"
+  r=2000m around (40.7506, -73.9936)  |  OSM data: 2026-06-24T17:47:47Z
+────────────────────────────────────────────────────────────────────────
+
+  ── EXACT matches with name:ja (0) ──
+
+  ── EXACT matches WITHOUT name:ja (0) ──
+
+  ── FUZZY / VARIANT matches with name:ja (0) ──
+
+  ── FUZZY / VARIANT matches WITHOUT name:ja (0) ──
+
+  ── ENCLOSING areas with name:ja (0) ──
+
+  ── ENCLOSING areas without name:ja (0) ──
+
+────────────────────────────────────────────────────────────────────────
+  Total features examined : 0
+  With name:ja            : 0
+────────────────────────────────────────────────────────────────────────

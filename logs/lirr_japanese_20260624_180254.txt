@@ -1,0 +1,1019 @@
+────────────────────────────────────────────────────────────────────────
+  LIRR — Japanese name audit  |  r=2000m per station
+  OSM data: 2026-06-24T18:00:00Z
+────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────
+  Kew Gardens  (40.70956, -73.83080)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Laurelton  (40.66852, -73.75184)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Copiague  (40.68105, -73.39902)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Lynbrook  (40.65591, -73.67522)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Centre Avenue  (40.64817, -73.66382)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Mets–Willets Point  (40.75243, -73.84412)
+
+    [nearby   533m  score=0.21]  Citi Field
+      name:ja             : シティ・フィールド
+      meta : wikidata=Q1072882
+
+────────────────────────────────────────
+  Flushing–Main Street  (40.75852, -73.82986)
+
+    [nearby  1358m  score=0.20]  Citi Field
+      name:ja             : シティ・フィールド
+      meta : wikidata=Q1072882
+
+────────────────────────────────────────
+  Woodside  (40.74616, -73.90329)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Long Island City  (40.74151, -73.95698)
+
+    [nearby  1197m  score=0.25]  (no native name)
+      name:ja             : NY滞在先
+
+    [nearby  1264m  score=0.23]  Japanese Peace Bell
+      name:ja             : 日本の平和の鐘
+      meta : wikidata=Q2067390
+
+    [nearby  1266m  score=0.14]  United Nations Headquarters
+      name:ja             : 国際連合本部ビル
+      meta : tourism=attraction  |  wikidata=Q11297
+
+    [nearby  1297m  score=0.20]  United Nations
+      name:ja             : 国際連合
+      meta : wikidata=Q11297
+
+    [nearby  1386m  score=0.33]  UN Visitors Entrance
+      name:ja             : 国連ビジター入口
+
+    [nearby  1421m  score=0.13]  Permanent Mission of the United States to the United Nations
+      name:ja             : 国際連合米国政府代表部
+      meta : wikidata=Q7890766
+
+    [nearby  1430m  score=0.28]  UN Visitors Check-in Office
+      name:ja             : 国連ビジターチェックインオフィス
+
+    [nearby  1504m  score=0.12]  United Nations International School
+      name:ja             : 国連国際学校
+      meta : amenity=school  |  wikidata=Q14707545
+
+    [fuzzy   1553m  score=0.48]  Japan Society
+      name:ja             : ジャパンソサエティ
+      meta : tourism=yes  |  wikidata=Q15032072
+
+    [nearby  1746m  score=0.16]  Permanent Mission of Japan to the United Nations
+      name:ja             : 国際連合日本政府代表部
+
+    [nearby  1886m  score=0.07]  Totto Ramen
+      name:ja             : 鳥人ラーメン、鳥人拉麺
+
+    [nearby  1931m  score=0.28]  Newtown Creek
+      name:ja             : ニュータウン川
+      meta : wikidata=Q1983826
+
+    [nearby  1997m  score=0.15]  United States Post Office
+      name:ja             : 郵便局
+      meta : amenity=post_office  |  operator=United States Postal Service
+
+────────────────────────────────────────
+  Bayside  (40.76310, -73.77190)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Forest Hills  (40.71959, -73.84486)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Hollis  (40.71017, -73.76667)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Floral Park  (40.72464, -73.70626)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Hunterspoint Avenue  (40.74205, -73.94756)
+
+    [fuzzy    465m  score=0.46]  (no native name)
+      name:ja             : NY滞在先
+
+    [nearby  1714m  score=0.31]  Newtown Creek
+      name:ja             : ニュータウン川
+      meta : wikidata=Q1983826
+
+    [nearby  1882m  score=0.26]  United Nations Headquarters
+      name:ja             : 国際連合本部ビル
+      meta : tourism=attraction  |  wikidata=Q11297
+
+    [nearby  1888m  score=0.16]  Japanese Peace Bell
+      name:ja             : 日本の平和の鐘
+      meta : wikidata=Q2067390
+
+    [nearby  1889m  score=0.36]  United Nations
+      name:ja             : 国際連合
+      meta : wikidata=Q11297
+
+    [fuzzy   1965m  score=0.46]  UN Visitors Entrance
+      name:ja             : 国連ビジター入口
+
+────────────────────────────────────────
+  Nostrand Avenue  (40.67838, -73.94820)
+
+    [nearby  1713m  score=0.27]  Ozakaya
+      name:ja             : お酒屋
+      meta : amenity=restaurant
+
+────────────────────────────────────────
+  East New York  (40.67588, -73.90328)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Seaford  (40.67572, -73.48674)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Massapequa  (40.67696, -73.46834)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Massapequa Park  (40.67787, -73.45450)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Lindenhurst  (40.68821, -73.36934)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Valley Stream  (40.66148, -73.70459)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Rosedale  (40.66589, -73.73579)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Stony Brook  (40.92154, -73.12797)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  New York Penn Station  (40.75024, -73.99281)
+
+    [exact      0m  score=1.00]  New York Penn Station
+      name:ja             : ペンシルベニア駅
+      meta : railway=station  |  public_transport=station  |  network=Amtrak;NJ Transit;LIRR  |  wikidata=Q54451
+
+    [nearby    66m  score=0.29]  Madison Square Garden
+      name:ja             : マディソン・スクエア・ガーデン
+      meta : tourism=attraction  |  wikidata=Q186125
+
+    [nearby   269m  score=0.31]  Blue Bottle Coffee
+      name:ja             : ブルーボトルコーヒー
+      brand:ja            : ブルーボトルコーヒー
+      meta : amenity=cafe
+
+    [nearby   293m  score=0.14]  Ichiran
+      name:ja             : 一蘭
+      description:ja      : 天然とんこつラーメン専門店
+      meta : amenity=restaurant
+
+    [nearby   415m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+
+    [nearby   416m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+
+    [nearby   423m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+
+    [nearby   425m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   426m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   427m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+
+    [nearby   434m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   437m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   449m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   463m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   472m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   477m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   487m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   506m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   520m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   524m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   537m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   558m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   562m  score=0.32]  Chelsea District
+      name:ja             : チェルシー
+      meta : place=neighbourhood
+
+    [nearby   579m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   587m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   619m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   641m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   642m  score=0.08]  Muji
+      name:ja             : 無印良品
+      brand:ja            : 無印良品
+      meta : shop=department_store
+
+    [nearby   644m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   650m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   673m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   682m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   707m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   709m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   728m  score=0.08]  Muji
+      name:ja             : 無印良品
+      brand:ja            : 無印良品
+      meta : shop=department_store
+
+    [nearby   735m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   769m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   783m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   790m  score=0.19]  Kinokuniya
+      name:ja             : 紀伊国屋書店
+      name:ja-Hira        : きのくにやしょてん
+      meta : shop=books
+
+    [nearby   798m  score=0.31]  Blue Bottle Coffee
+      name:ja             : ブルーボトルコーヒー
+      brand:ja            : ブルーボトルコーヒー
+      meta : amenity=cafe
+
+    [nearby   813m  score=0.14]  Yamadaya
+      name:ja             : 山田屋
+      meta : shop=convenience
+
+    [nearby   819m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   821m  score=0.31]  Blue Bottle Coffee
+      name:ja             : ブルーボトルコーヒー
+      brand:ja            : ブルーボトルコーヒー
+      meta : amenity=cafe
+
+    [nearby   871m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   873m  score=0.25]  Bryant Park
+      name:ja             : ブライアントパーク
+      meta : tourism=attraction  |  operator=Bryant Park Corporation  |  wikidata=Q995174
+
+    [nearby   891m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   947m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   950m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   963m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby   992m  score=0.08]  Muji
+      name:ja             : 無印良品
+      brand:ja            : 無印良品
+      meta : shop=department_store
+
+    [nearby  1002m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1017m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1054m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [fuzzy   1081m  score=0.52]  New York Marriott Marquis
+      name:ja             : ニュヨークマリオットマーキース
+      meta : tourism=hotel  |  wikidata=Q7013741
+
+    [nearby  1093m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1103m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1159m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1171m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1176m  score=0.24]  Duffy Square
+      name:ja             : ダフィー・スクエア
+      meta : wikidata=Q901251
+
+    [nearby  1197m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1209m  score=0.08]  Muji
+      name:ja             : 無印良品
+      brand:ja            : 無印良品
+      meta : shop=department_store
+
+    [nearby  1249m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1252m  score=0.15]  Ippudo
+      name:ja             : 一風堂
+      brand:ja            : 一風堂
+      meta : amenity=restaurant
+
+    [nearby  1258m  score=0.31]  Blue Bottle Coffee
+      name:ja             : ブルーボトルコーヒー
+      brand:ja            : ブルーボトルコーヒー
+      meta : amenity=cafe
+
+    [nearby  1260m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1310m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1320m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1335m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [fuzzy   1336m  score=0.42]  Grand Central Terminal
+      name:ja             : グランド・セントラル駅
+      meta : tourism=attraction  |  operator=Metropolitan Transportation Authority  |  wikidata=Q11290
+
+    [nearby  1338m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1352m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1363m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1377m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1381m  score=0.31]  Blue Bottle Coffee
+      name:ja             : ブルーボトルコーヒー
+      brand:ja            : ブルーボトルコーヒー
+      meta : amenity=cafe
+
+    [nearby  1390m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1417m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1437m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1466m  score=0.31]  Rockefeller Center
+      name:ja             : ロックフェラー・センター
+      meta : tourism=attraction  |  wikidata=Q11277
+
+    [nearby  1467m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1492m  score=0.32]  Permanent Mission of Japan to the United Nations
+      name:ja             : 国際連合日本政府代表部
+
+    [nearby  1506m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1536m  score=0.35]  United States Post Office
+      name:ja             : 郵便局
+      meta : amenity=post_office  |  operator=United States Postal Service
+
+    [nearby  1566m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1572m  score=0.15]  Ippudo
+      name:ja             : 一風堂
+      brand:ja            : 一風堂
+      meta : amenity=restaurant
+
+    [nearby  1578m  score=0.29]  Hell's Kitchen
+      name:ja             : ヘルズ・キッチン
+      meta : place=neighbourhood
+
+    [nearby  1617m  score=0.21]  Union Square Park
+      name:ja             : ユニオンスクエア公園
+      meta : operator=New York City Department of Parks and Recreation  |  wikidata=Q110007
+
+    [nearby  1629m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [fuzzy   1662m  score=0.47]  George Washington
+      name:ja             : ジョージ・ワシントン像
+      meta : wikidata=Q17182170
+
+    [nearby  1668m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1679m  score=0.09]  Consulate General of Japan
+      name:ja             : 日本国総領事館
+      meta : wikidata=Q84760380
+
+    [nearby  1720m  score=0.29]  Hell's Kitchen
+      name:ja             : ヘルズ・キッチン
+      meta : boundary=place  |  wikidata=Q840133
+
+    [nearby  1724m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1788m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1796m  score=0.31]  Blue Bottle Coffee
+      name:ja             : ブルーボトルコーヒー
+      brand:ja            : ブルーボトルコーヒー
+      meta : amenity=cafe
+
+    [nearby  1797m  score=0.31]  Blue Bottle Coffee
+      name:ja             : ブルーボトルコーヒー
+      brand:ja            : ブルーボトルコーヒー
+      meta : amenity=cafe
+
+    [nearby  1799m  score=0.35]  Whitney Museum of American Art
+      name:ja             : ホイットニー美術館
+      meta : tourism=museum  |  wikidata=Q639791
+
+    [nearby  1854m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1857m  score=0.31]  Blue Bottle Coffee
+      name:ja             : ブルーボトルコーヒー
+      brand:ja            : ブルーボトルコーヒー
+      meta : amenity=cafe
+
+    [nearby  1866m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1869m  score=0.32]  Paley Park
+      name:ja             : ペイリーパーク
+      meta : wikidata=Q5951152
+
+    [nearby  1933m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1976m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+    [nearby  1998m  score=0.14]  Broadway
+      name:ja             : ブロードウェイ
+      meta : wikidata=Q11260
+
+────────────────────────────────────────
+  Oceanside  (40.63485, -73.65470)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  East Rockaway  (40.64214, -73.65814)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  St. Albans  (40.69126, -73.76557)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Auburndale  (40.76145, -73.78972)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Little Neck  (40.77453, -73.74126)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Port Washington  (40.83021, -73.68778)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Douglaston  (40.76836, -73.74925)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Great Neck  (40.78703, -73.72676)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Broadway  (40.76172, -73.80182)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Bethpage  (40.74328, -73.48381)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Locust Manor  (40.67510, -73.76501)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Island Park  (40.60099, -73.65505)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Hicksville  (40.76713, -73.52869)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Syosset  (40.82493, -73.50019)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Hewlett  (40.63683, -73.70498)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Kings Park  (40.88382, -73.25460)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Baldwin  (40.65673, -73.60703)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Country Life Press  (40.72139, -73.62954)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Sea Cliff  (40.85213, -73.62560)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Murray Hill  (40.76271, -73.81461)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Carle Place  (40.74927, -73.60375)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Plandome  (40.81006, -73.69525)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Cedarhurst  (40.62231, -73.72596)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Far Rockaway  (40.60904, -73.75065)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Saint James  (40.88327, -73.15814)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Smithtown  (40.85616, -73.19908)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Northport  (40.88082, -73.32682)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Huntington  (40.85269, -73.41094)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Cold Spring Harbor  (40.83514, -73.45161)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Freeport  (40.65745, -73.58229)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Merrick  (40.66382, -73.55050)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Bellmore  (40.66893, -73.52839)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Wantagh  (40.67300, -73.50893)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Amityville  (40.68025, -73.42052)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Rockville Centre  (40.65833, -73.64685)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Hempstead Gardens  (40.69498, -73.64612)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  East Williston  (40.75612, -73.63941)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Albertson  (40.77185, -73.64166)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Greenvale  (40.81578, -73.62690)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Glen Head  (40.83218, -73.62610)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Manhasset  (40.79657, -73.69993)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Speonk  (40.82122, -72.70484)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Farmingdale  (40.73567, -73.44175)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Atlantic Terminal  (40.68466, -73.97731)
+
+    [nearby  1043m  score=0.25]  Ozakaya
+      name:ja             : お酒屋
+      meta : amenity=restaurant
+
+    [nearby  1086m  score=0.17]  Blue Bottle Coffee
+      name:ja             : ブルーボトルコーヒー
+      brand:ja            : ブルーボトルコーヒー
+      meta : amenity=cafe
+
+    [nearby  1396m  score=0.24]  New York
+      name:ja             : ニューヨーク
+      meta : boundary=administrative  |  admin_level=5  |  wikidata=Q60
+
+    [nearby  1961m  score=0.16]  Ippudo V
+      name:ja             : 一風堂
+      brand:ja            : 一風堂
+      meta : amenity=restaurant
+
+────────────────────────────────────────
+  Jamaica  (40.69984, -73.80770)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Westbury  (40.75344, -73.58587)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Mineola  (40.74041, -73.64057)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Merillon Avenue  (40.73546, -73.66129)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  New Hyde Park  (40.73085, -73.68055)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Bellerose  (40.72216, -73.71668)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Belmont Park  (40.71367, -73.72830)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Queens Village  (40.71757, -73.73593)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Mastic–Shirley  (40.79891, -72.86452)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Bellport  (40.77368, -72.94375)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Patchogue  (40.76183, -73.01575)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Sayville  (40.74039, -73.08636)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Islip  (40.73584, -73.20933)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Oakdale  (40.74341, -73.13239)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Great River  (40.74047, -73.16999)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Bay Shore  (40.72499, -73.25296)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Babylon  (40.70063, -73.32426)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Montauk  (41.04691, -71.95435)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Amagansett  (40.98002, -72.13268)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  East Hampton  (40.96505, -72.19351)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Bridgehampton  (40.93920, -72.30972)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Southampton  (40.89487, -72.38983)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Hampton Bays  (40.87650, -72.52439)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Westhampton  (40.83025, -72.65097)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Ronkonkoma  (40.80808, -73.10600)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Central Islip  (40.79207, -73.19371)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Brentwood  (40.78107, -73.24249)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Deer Park  (40.76958, -73.29310)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Wyandanch  (40.75479, -73.35804)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Pinelawn  (40.74527, -73.39989)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Greenport  (41.09972, -72.36313)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Southold  (41.06630, -72.42786)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Mattituck  (40.99176, -72.53603)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Riverhead  (40.91979, -72.66691)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Yaphank  (40.82562, -72.91586)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Medford  (40.81735, -72.99919)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Port Jefferson  (40.93458, -73.05366)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Greenlawn  (40.86870, -73.36272)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  West Hempstead  (40.70262, -73.64122)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Lakeview  (40.68583, -73.65218)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Malverne  (40.67531, -73.66913)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Westwood  (40.66824, -73.68145)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Oyster Bay  (40.87531, -73.53403)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Locust Valley  (40.87453, -73.59838)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Glen Cove  (40.86576, -73.61646)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Glen Street  (40.85831, -73.62078)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Roslyn  (40.79079, -73.64325)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Hempstead  (40.71219, -73.62485)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Garden City  (40.72312, -73.64024)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Nassau Boulevard  (40.72295, -73.66279)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Stewart Manor  (40.72302, -73.68102)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Long Beach  (40.58920, -73.66481)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Inwood  (40.61221, -73.74441)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Lawrence  (40.61515, -73.73692)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Woodmere  (40.63163, -73.71334)
+    (no name:ja features within radius)
+
+────────────────────────────────────────
+  Gibson  (40.64925, -73.70184)
+    (no name:ja features within radius)
+
+────────────────────────────────────────────────────────────────────────
+  Stations with ≥1 name:ja feature nearby : 7 / 124
+────────────────────────────────────────────────────────────────────────

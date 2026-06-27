@@ -1,0 +1,83 @@
+────────────────────────────────────────────────────────────────────────
+  OSM Japanese-name audit  —  "Penn Station"
+  r=2000m around (40.7506, -73.9936)  |  OSM data: 2026-06-24T17:56:58Z
+────────────────────────────────────────────────────────────────────────
+
+  ── EXACT matches with name:ja (1) ──
+
+[001] node/895371274  (40.75024, -73.99281)
+      native name  : New York Penn Station
+      name:ja             : ペンシルベニア駅
+      meta         : railway=station  |  public_transport=station  |  network=Amtrak;NJ Transit;LIRR  |  wikidata=Q54451
+
+  ── EXACT matches WITHOUT name:ja (1) ──
+
+[002] way/541431082  ()
+      native name  : Penn Station (Upper Level)
+      (no name:ja)
+      meta         : operator=Amtrak
+
+  ── FUZZY / VARIANT matches with name:ja (2) ──
+
+[003] node/424555887  (40.73538, -73.99070)
+      native name  : George Washington  [score=0.41]
+      name:ja             : ジョージ・ワシントン像
+      meta         : wikidata=Q17182170
+
+[004] way/265947358  (40.75265, -73.97727)
+      native name  : Grand Central Terminal  [score=0.41]
+      name:ja             : グランド・セントラル駅
+      meta         : tourism=attraction  |  operator=Metropolitan Transportation Authority  |  wikidata=Q11290
+
+  ── FUZZY / VARIANT matches WITHOUT name:ja (3) ──
+
+[005] way/138141255  ()
+      native name  : (no native name)  [score=0.43]
+      (no name:ja)
+
+[006] way/812714851  ()
+      native name  : Pennsylvania Station  [score=0.75]
+      (no name:ja)
+      meta         : operator=Amtrak
+
+[007] way/1348722213  ()
+      native name  : (no native name)  [score=0.43]
+      (no name:ja)
+
+  ── ENCLOSING areas with name:ja (5) ──
+
+      New York
+        name:ja             : ニューヨーク州
+        meta         : boundary=administrative  |  admin_level=4  |  wikidata=Q1384
+
+      United States of America
+        name:ja             : アメリカ合衆国
+        alt_name:ja         : 米国
+        meta         : boundary=administrative  |  admin_level=2  |  wikidata=Q30
+
+      New York
+        name:ja             : ニューヨーク
+        meta         : boundary=administrative  |  admin_level=5  |  wikidata=Q60
+
+      Manhattan Island
+        name:ja             : マンハッタン島
+        meta         : place=island  |  wikidata=Q15063317
+
+      Contiguous United States
+        name:ja             : アメリカ合衆国本土
+        meta         : boundary=region  |  place=region  |  wikidata=Q578170
+
+  ── ENCLOSING areas without name:ja (8) ──
+      New York County
+      America/New_York Timezone
+      Manhattan Community Board 5
+      Chelsea
+      Manhattan
+      UTC-05:00 standard time
+      Congestion Relief Zone
+      Downstate New York
+
+────────────────────────────────────────────────────────────────────────
+  Total features examined : 20
+  With name:ja            : 8
+────────────────────────────────────────────────────────────────────────

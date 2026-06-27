@@ -1,0 +1,62 @@
+────────────────────────────────────────────────────────────────────────
+  OSM Japanese-name audit  —  "Penn Station"
+  r=2000m around (40.7506, -73.9936)  |  OSM data: 2026-06-24T17:40:45Z
+────────────────────────────────────────────────────────────────────────
+
+  ── EXACT matches with name:ja (0) ──
+
+  ── EXACT matches WITHOUT name:ja (0) ──
+
+  ── FUZZY / VARIANT matches with name:ja (0) ──
+
+  ── FUZZY / VARIANT matches WITHOUT name:ja (0) ──
+
+  ── ENCLOSING areas with name:ja (7) ──
+
+      Madison Square Garden
+        name:ja             : マディソン・スクエア・ガーデン
+        meta         : tourism=attraction  |  wikidata=Q186125
+
+      Chelsea District
+        name:ja             : チェルシー
+        meta         : place=neighbourhood
+
+      New York
+        name:ja             : ニューヨーク州
+        meta         : boundary=administrative  |  admin_level=4  |  wikidata=Q1384
+
+      United States of America
+        name:ja             : アメリカ合衆国
+        alt_name:ja         : 米国
+        meta         : boundary=administrative  |  admin_level=2  |  wikidata=Q30
+
+      New York
+        name:ja             : ニューヨーク
+        meta         : boundary=administrative  |  admin_level=5  |  wikidata=Q60
+
+      Manhattan Island
+        name:ja             : マンハッタン島
+        meta         : place=island  |  wikidata=Q15063317
+
+      Contiguous United States
+        name:ja             : アメリカ合衆国本土
+        meta         : boundary=region  |  place=region  |  wikidata=Q578170
+
+  ── ENCLOSING areas without name:ja (12) ──
+      (no native name)
+      Penn Station (Upper Level)
+      Pennsylvania Station
+      (no native name)
+      New York County
+      America/New_York Timezone
+      Manhattan Community Board 5
+      Chelsea
+      Manhattan
+      UTC-05:00 standard time
+      Congestion Relief Zone
+      Downstate New York
+
+────────────────────────────────────────────────────────────────────────
+  Total features examined : 19
+  With name:ja            : 7
+────────────────────────────────────────────────────────────────────────
