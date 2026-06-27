@@ -119,6 +119,11 @@ OBA loads the full transit bundle into memory at startup. Wait until the `oba_ap
 
 > **After any rebuild** of any service, always re-run the `OBA_API_KEY=<your-oba-api-key> docker compose up -d transit-board-api` and `docker restart transit-board-frontend-1` steps. `docker compose up --build` cascades restarts that wipe injected env vars.
 
+> **Frontend rebuild gotchas:**
+> - Use `docker compose build --no-cache frontend` (not `docker compose build`) — Docker layer caching can serve a stale image even when source files changed.
+> - Use `docker compose up -d frontend` (not `docker restart transit-board-frontend-1`) to actually swap to the new image — `docker restart` only restarts the existing container with the old image.
+> - If `docker compose up` fails with `network external-proxy-net not found`, run `docker network create external-proxy-net` first. This network is normally created by the reverse proxy stack and persists across reboots, but may need manual creation after a full teardown.
+
 ---
 
 ## Timetable web app
