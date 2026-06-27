@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "gen-ja": "node scripts/csv-to-json.js",
+    "build": "npm run gen-ja && vite build",
     "preview": "vite preview",
     "test": "vitest run"
   },

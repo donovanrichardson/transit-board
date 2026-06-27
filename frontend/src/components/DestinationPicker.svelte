@@ -1,8 +1,10 @@
 <script>
   import { createEventDispatcher } from 'svelte';
+  import { jaHeadsign } from '../lib/locale.js';
 
   export let headsigns = [];
   export let destinations = [];
+  export let lang = 'en';
 
   const dispatch = createEventDispatcher();
 
@@ -14,9 +16,11 @@
   let searchText = '';
 
   $: displayList = destinations.length > 0 ? destinations : headsigns;
-  $: filteredHeadsigns = displayList.filter((h) =>
-    h.toLowerCase().includes(searchText.toLowerCase())
-  );
+  $: filteredHeadsigns = displayList.filter((h) => {
+    const jaName = lang === 'ja' ? jaHeadsign(h, h) : null;
+    const query = searchText.toLowerCase();
+    return h.toLowerCase().includes(query) || (jaName && jaName.includes(query));
+  });
 
   function selectDirection(dir) {
     directionMode = dir;
@@ -40,14 +44,14 @@
       class:active={directionMode === 'inbound'}
       on:click={() => selectDirection('inbound')}
     >
-      Inbound
+      {lang === 'ja' ? '都心方面' : 'Inbound'}
     </button>
     <button
       class="direction-btn"
       class:active={directionMode === 'outbound'}
       on:click={() => selectDirection('outbound')}
     >
-      Outbound
+      {lang === 'ja' ? '郊外方面' : 'Outbound'}
     </button>
   </div>
 
@@ -64,7 +68,7 @@
           <div class="dropdown-empty">No results</div>
         {/if}
         {#each filteredHeadsigns as headsign}
-          <button class="dropdown-item" on:click={() => selectHeadsign(headsign)}>{headsign}</button>
+          <button class="dropdown-item" on:click={() => selectHeadsign(headsign)}>{lang === 'ja' ? jaHeadsign(headsign, headsign) : headsign}</button>
         {/each}
       </div>
     {/if}

@@ -1,5 +1,6 @@
 <script>
   import { CITY_TERMINALS, HEADSIGN_ABBREVIATIONS } from '../lib/lirr.js';
+  import { jaStopName, jaHeadsign } from '../lib/locale.js';
 
   export let stop = null;
   export let departures = [];
@@ -7,6 +8,7 @@
   export let lirrDestinationMode = 'inbound';
   export let lirrSelectedHeadsign = null;
   export let headsignAbbrevVisibility = null;
+  export let lang = 'en';
 
   // 3-step cascade over all departures to pick the underline color.
   $: lineColor = (() => {
@@ -100,11 +102,32 @@
     }
     return 'Inbound';
   })();
+
+  $: jaDirectionLabel = (() => {
+    if (lang !== 'ja') return null;
+    if (lirrDestinationMode === 'specific' && lirrSelectedHeadsign) {
+      return jaHeadsign(lirrSelectedHeadsign, lirrSelectedHeadsign);
+    }
+    return null;
+  })();
+
+  $: jaStopTitle = (() => {
+    if (lang !== 'ja' || !stop) return null;
+    const id = stop.id;
+    return jaStopName(id, null);
+  })();
 </script>
 
 <header class="timetable-header" style="border-bottom: 4px solid {lineColor};">
   <div class="header-top">
-    <h1 class="stop-name">{stopTitle}</h1>
+    <h1 class="stop-name">
+      {#if lang === 'ja' && jaStopTitle}
+        {jaStopTitle}
+        <span class="stop-name-en">{stopTitle}</span>
+      {:else}
+        {stopTitle}
+      {/if}
+    </h1>
     {#if hasSiblings}
       {#each stop.siblingStopIds as siblingId}
         <a href="/stop/{siblingId}" class="direction-toggle">
@@ -113,14 +136,21 @@
       {/each}
     {/if}
     {#if isLirrMode}
-      <span class="direction-label">{directionLabelText}</span>
+      <span class="direction-label">
+        {#if lang === 'ja' && jaDirectionLabel}
+          {jaDirectionLabel}
+          <span class="direction-label-en">{directionLabelText}</span>
+        {:else}
+          {directionLabelText}
+        {/if}
+      </span>
     {/if}
   </div>
 </header>
 
 {#if !hasDirection && visibleHeadsigns.length > 0}
   <div class="headsign-pills">
-    <p class="pills-label">Trips toward</p>
+    <p class="pills-label">{lang === 'ja' ? '駅方面' : 'Trips toward'}</p>
     <div class="pills-row">
       {#each visibleHeadsigns as headsign}
         {@const colors = headsignColor(headsign)}
@@ -133,7 +163,7 @@
             class="headsign-pill"
             style="background-color: {colors.bg}; color: {colors.text};"
           >
-            {headsign}
+            {lang === 'ja' ? (() => { const ja = jaHeadsign(headsign, headsign); return (headsign === 'Penn Station' || headsign === 'Grand Central') ? ja : ja.replace(/駅$/, ''); })() : headsign}
           </span>
         </div>
       {/each}
@@ -157,6 +187,20 @@
     font-size: 1.25rem;
     font-weight: 600;
     margin: 0;
+  }
+
+  .stop-name-en {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: #666;
+  }
+
+  .direction-label-en {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: #666;
   }
 
   .direction-toggle {

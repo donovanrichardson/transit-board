@@ -56,6 +56,24 @@
     }
   })();
 
+  // Language toggle state — read from localStorage, default 'en'
+  let lang = (() => {
+    try {
+      return localStorage.getItem('transitBoard.lang') ?? 'en';
+    } catch (_) {
+      return 'en';
+    }
+  })();
+
+  function setLang(l) {
+    lang = l;
+    try {
+      localStorage.setItem('transitBoard.lang', lang);
+    } catch (_) {
+      // ignore
+    }
+  }
+
   $: routes = data ? data.routes : [];
   $: agencyColor = data ? data.agencyColor : null;
   $: departures = data ? data.departures : [];
@@ -164,9 +182,10 @@
       stops={homeStops}
       loading={homeLoading}
       error={homeError}
+      {lang}
     />
   {:else if stopId}
-    <h1 class="board-title">LIRR Departure Board</h1>
+    <h1 class="board-title">{lang === 'ja' ? 'LIRR 発車時刻表' : 'LIRR Departure Board'}</h1>
     <Header
       {stop}
       departures={filteredDepartures}
@@ -174,23 +193,32 @@
       {lirrDestinationMode}
       {lirrSelectedHeadsign}
       {headsignAbbrevVisibility}
+      {lang}
     />
 
     <div class="print-date">
       {(() => {
         const [year, month, day] = date.split('-').map(Number);
-        return new Intl.DateTimeFormat('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(year, month - 1, day));
+        const locale = lang === 'ja' ? 'ja-JP' : 'en-US';
+        return new Intl.DateTimeFormat(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(year, month - 1, day));
       })()}
     </div>
 
     <DatePicker {date} on:change={onDateChange} />
 
-    <ClockToggle {clockMode} on:change={onClockModeChange} />
+    <div class="controls-row">
+      <ClockToggle {clockMode} on:change={onClockModeChange} />
+      <div class="lang-toggle">
+        <button class:active={lang === 'en'} on:click={() => setLang('en')}>EN</button>
+        <button class:active={lang === 'ja'} on:click={() => setLang('ja')}>日本語</button>
+      </div>
+    </div>
 
     {#if lirrMode}
       <DestinationPicker
         {headsigns}
         {destinations}
+        {lang}
         on:change={onDestinationChange}
       />
     {:else if headsigns.length > 0}
@@ -254,6 +282,35 @@
     padding: 24px 16px;
     color: #cc0000;
     font-size: 1rem;
+  }
+
+  .controls-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 16px 4px;
+    flex-wrap: wrap;
+  }
+
+  .lang-toggle {
+    display: flex;
+    gap: 4px;
+    margin-left: auto;
+  }
+
+  .lang-toggle button {
+    padding: 3px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+
+  .lang-toggle button.active {
+    background: #0039a6;
+    color: #fff;
+    border-color: #0039a6;
   }
 
   .print-date {
