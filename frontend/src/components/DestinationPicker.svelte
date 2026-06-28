@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher } from 'svelte';
   import { jaHeadsign } from '../lib/locale.js';
-  import { t } from '../lib/i18n.js';
+  import { t, normalizeKana } from '../lib/i18n.js';
 
   export let headsigns = [];
   export let destinations = [];
@@ -19,8 +19,8 @@
   $: displayList = destinations.length > 0 ? destinations : headsigns;
   $: filteredHeadsigns = displayList.filter((h) => {
     const jaName = lang === 'ja' ? jaHeadsign(h, h) : null;
-    const query = searchText.toLowerCase();
-    return h.toLowerCase().includes(query) || (jaName && jaName.includes(query));
+    const query = normalizeKana(searchText.toLowerCase());
+    return h.toLowerCase().includes(query) || (jaName && normalizeKana(jaName).includes(query));
   });
 
   function selectDirection(dir) {

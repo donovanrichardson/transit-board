@@ -1,6 +1,6 @@
 <script>
   import { jaStopName } from '../lib/locale.js';
-  import { t, sortStops } from '../lib/i18n.js';
+  import { t, sortStops, normalizeKana } from '../lib/i18n.js';
 
   export let stops = [];
   export let loading = false;
@@ -11,8 +11,8 @@
 
   $: filteredStops = stops.filter((s) => {
     const jaName = lang === 'ja' ? jaStopName(s.id, s.name) : s.name;
-    const query = searchText.toLowerCase();
-    return s.name.toLowerCase().includes(query) || jaName.includes(query);
+    const query = normalizeKana(searchText.toLowerCase());
+    return s.name.toLowerCase().includes(query) || normalizeKana(jaName).includes(query);
   });
 
   $: sortedStops = sortStops(filteredStops, lang, jaStopName);

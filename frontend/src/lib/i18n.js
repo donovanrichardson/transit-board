@@ -87,6 +87,16 @@ export function getNoStopIdError(lang) {
  * @param {(id: string, fallback: string|null) => string|null} jaStopNameFn
  * @returns {Array}
  */
+/**
+ * Normalize Japanese kana for search: converts hiragana to katakana so that
+ * hiragana and katakana input match the same text.
+ * @param {string} str
+ * @returns {string}
+ */
+export function normalizeKana(str) {
+  return str.replace(/[ぁ-ゖ]/g, ch => String.fromCharCode(ch.charCodeAt(0) + 0x60));
+}
+
 export function sortStops(stops, lang, jaStopNameFn) {
   if (lang !== 'ja') return stops;
   return [...stops].sort((a, b) => {

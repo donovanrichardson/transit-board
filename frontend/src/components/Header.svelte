@@ -107,7 +107,8 @@
   $: jaDirectionLabel = (() => {
     if (lang !== 'ja') return null;
     if (lirrDestinationMode === 'specific' && lirrSelectedHeadsign) {
-      return jaHeadsign(lirrSelectedHeadsign, lirrSelectedHeadsign);
+      const ja = jaHeadsign(lirrSelectedHeadsign, lirrSelectedHeadsign);
+      return ja.replace(/駅$/, '') + '方面';
     }
     if (lirrDestinationMode === 'outbound') return '郊外方面';
     return '都心方面';
