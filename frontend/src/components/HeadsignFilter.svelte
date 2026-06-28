@@ -1,8 +1,10 @@
 <script>
   import { createEventDispatcher, tick } from 'svelte';
+  import { t } from '../lib/i18n.js';
 
   export let headsigns = [];
   export let selected = new Set();
+  export let lang = 'en';
 
   const dispatch = createEventDispatcher();
 
@@ -26,7 +28,7 @@
         checked[index] = true;
         // Force re-assignment to trigger reactivity
         checked = [...checked];
-        errorMessage = 'At least one destination must be selected.';
+        errorMessage = t('atLeastOneDestination', lang);
         return;
       }
     }

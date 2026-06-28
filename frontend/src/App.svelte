@@ -3,6 +3,7 @@
   import { fetchSchedule, fetchStops } from './lib/api.js';
   import { isLirr } from './lib/lirr.js';
   import { filterDepartures, computeHeadsignAbbreviationVisibility } from './lib/timetable.js';
+  import { getScheduleError, getHomeError, getNoStopIdError } from './lib/i18n.js';
   import Header from './components/Header.svelte';
   import DatePicker from './components/DatePicker.svelte';
   import HeadsignFilter from './components/HeadsignFilter.svelte';
@@ -112,14 +113,7 @@
       data = await fetchSchedule(stopId, date);
       selectedHeadsigns = new Set(data.headsigns);
     } catch (e) {
-      const status = e.message;
-      if (status === '404') {
-        error = 'Stop not found.';
-      } else if (status === '400') {
-        error = 'Invalid request.';
-      } else {
-        error = 'Could not load schedule. Try again later.';
-      }
+      error = getScheduleError(e.message, lang);
     } finally {
       loading = false;
     }
@@ -132,7 +126,7 @@
       const result = await fetchStops('LI');
       homeStops = result.stops || [];
     } catch (e) {
-      homeError = 'Could not load stations. Try again later.';
+      homeError = getHomeError(lang);
     } finally {
       homeLoading = false;
     }
@@ -210,7 +204,7 @@
       })()}
     </div>
 
-    <DatePicker {date} on:change={onDateChange} />
+    <DatePicker {date} {lang} on:change={onDateChange} />
 
     <div class="controls-row">
       <ClockToggle {clockMode} on:change={onClockModeChange} />
@@ -231,6 +225,7 @@
       <HeadsignFilter
         {headsigns}
         selected={selectedHeadsigns}
+        {lang}
         on:change={onHeadsignChange}
       />
     {/if}
@@ -249,10 +244,11 @@
         {lirrDestinationMode}
         {lirrSelectedHeadsign}
         {clockMode}
+        {lang}
       />
     {/if}
   {:else}
-    <p class="error-message">No stop ID specified. Navigate to /stop/&lt;stopId&gt;.</p>
+    <p class="error-message">{getNoStopIdError(lang)}</p>
   {/if}
 </div>
 

@@ -1,6 +1,7 @@
 <script>
   import { CITY_TERMINALS, HEADSIGN_ABBREVIATIONS } from '../lib/lirr.js';
   import { jaStopName, jaHeadsign } from '../lib/locale.js';
+  import { t } from '../lib/i18n.js';
 
   export let stop = null;
   export let departures = [];
@@ -41,7 +42,7 @@
   $: hasSiblings = !isLirrMode && stop && stop.siblingStopIds && stop.siblingStopIds.length > 0;
   $: stopTitle = stop
     ? ((!isLirrMode && stop.direction) ? `${stop.name} (${stop.direction})` : stop.name)
-    : 'Loading…';
+    : t('loading', lang);
 
   function headsignColor(headsign) {
     const byColor = {};
@@ -150,7 +151,7 @@
 
 {#if !hasDirection && visibleHeadsigns.length > 0}
   <div class="headsign-pills">
-    <p class="pills-label">{lang === 'ja' ? '駅方面' : 'Trips toward'}</p>
+    <p class="pills-label">{t('tripsToward', lang)}</p>
     <div class="pills-row">
       {#each visibleHeadsigns as headsign}
         {@const colors = headsignColor(headsign)}
@@ -163,8 +164,14 @@
             class="headsign-pill"
             style="background-color: {colors.bg}; color: {colors.text};"
           >
-            {lang === 'ja' ? (() => { const ja = jaHeadsign(headsign, headsign); return (headsign === 'Penn Station' || headsign === 'Grand Central') ? ja : ja.replace(/駅$/, ''); })() : headsign}
+            {headsign}
           </span>
+          {#if lang === 'ja'}
+            {@const jaName = jaHeadsign(headsign, null)}
+            {#if jaName !== null}
+              <span class="pill-ja-name">{jaName}</span>
+            {/if}
+          {/if}
         </div>
       {/each}
     </div>
@@ -270,5 +277,13 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 200px;
+  }
+
+  .pill-ja-name {
+    display: block;
+    font-size: 0.65rem;
+    color: #333;
+    text-align: center;
+    margin-top: 2px;
   }
 </style>

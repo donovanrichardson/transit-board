@@ -1,5 +1,6 @@
 <script>
   import { jaStopName } from '../lib/locale.js';
+  import { t, sortStops } from '../lib/i18n.js';
 
   export let stops = [];
   export let loading = false;
@@ -13,32 +14,34 @@
     const query = searchText.toLowerCase();
     return s.name.toLowerCase().includes(query) || jaName.includes(query);
   });
+
+  $: sortedStops = sortStops(filteredStops, lang, jaStopName);
 </script>
 
 <div class="home-page">
   <header class="home-header">
     <h1 class="home-title">{lang === 'ja' ? 'LIRR 発車時刻表' : 'LIRR Departure Board'}</h1>
-    <p class="home-subtitle">Select your origin station</p>
+    <p class="home-subtitle">{t('selectOriginStation', lang)}</p>
   </header>
 
   <div class="search-area">
     <input
       type="text"
-      placeholder="Search stations..."
+      placeholder={t('searchStations', lang)}
       bind:value={searchText}
       on:input
     />
   </div>
 
   {#if loading}
-    <p class="status-message">Loading...</p>
+    <p class="status-message">{t('loading', lang)}</p>
   {:else if error}
-    <p class="status-message error-message">Could not load stations. Try again later.</p>
-  {:else if filteredStops.length === 0}
-    <p class="status-message">No stations found.</p>
+    <p class="status-message error-message">{error}</p>
+  {:else if sortedStops.length === 0}
+    <p class="status-message">{t('noStationsFound', lang)}</p>
   {:else}
     <ul class="station-list">
-      {#each filteredStops as stop}
+      {#each sortedStops as stop}
         <li class="station-item">
           <a href="/stop/{stop.id}" class="station-link">{lang === 'ja' ? jaStopName(stop.id, stop.name) : stop.name}</a>
         </li>

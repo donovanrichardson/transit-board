@@ -2,6 +2,7 @@
   import MinuteCell from './MinuteCell.svelte';
   import { groupByHour, computeRowColor, computeRouteIconVisibility, computeHeadsignAbbreviationVisibility, filterDepartures, formatHourLabel } from '../lib/timetable.js';
   import { HEADSIGN_ABBREVIATIONS, CITY_TERMINALS } from '../lib/lirr.js';
+  import { t } from '../lib/i18n.js';
 
   export let departures = [];
   export let routes = [];
@@ -14,6 +15,7 @@
   export let lirrSelectedHeadsign = null;
   // Clock display mode
   export let clockMode = '12h';
+  export let lang = 'en';
 
   $: filteredDepartures = filterDepartures(departures, { isLirrMode, lirrDestinationMode, lirrSelectedHeadsign, selectedHeadsigns });
 
@@ -63,7 +65,7 @@
 
 <div class="timetable">
   {#if allHours.length === 0}
-    <p class="no-service">No scheduled service for this date.</p>
+    <p class="no-service">{t('noService', lang)}</p>
   {:else}
     <table class="timetable-table">
       <tbody>

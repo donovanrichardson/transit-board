@@ -1,6 +1,7 @@
 <script>
   import { createEventDispatcher } from 'svelte';
   import { jaHeadsign } from '../lib/locale.js';
+  import { t } from '../lib/i18n.js';
 
   export let headsigns = [];
   export let destinations = [];
@@ -58,14 +59,14 @@
   <div class="destination-search">
     <input
       type="text"
-      placeholder="Search destinations..."
+      placeholder={t('searchDestinations', lang)}
       bind:value={searchText}
       on:input
     />
     {#if searchText}
       <div class="destination-dropdown">
         {#if filteredHeadsigns.length === 0}
-          <div class="dropdown-empty">No results</div>
+          <div class="dropdown-empty">{t('noResults', lang)}</div>
         {/if}
         {#each filteredHeadsigns as headsign}
           <button class="dropdown-item" on:click={() => selectHeadsign(headsign)}>{lang === 'ja' ? jaHeadsign(headsign, headsign) : headsign}</button>

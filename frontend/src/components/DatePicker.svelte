@@ -1,7 +1,9 @@
 <script>
   import { createEventDispatcher } from 'svelte';
+  import { t } from '../lib/i18n.js';
 
   export let date = '';
+  export let lang = 'en';
 
   const dispatch = createEventDispatcher();
 
@@ -11,7 +13,7 @@
 </script>
 
 <div class="date-picker">
-  <label for="schedule-date">Date</label>
+  <label for="schedule-date">{t('date', lang)}</label>
   <input
     id="schedule-date"
     type="date"
