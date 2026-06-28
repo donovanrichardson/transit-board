@@ -109,7 +109,8 @@
     if (lirrDestinationMode === 'specific' && lirrSelectedHeadsign) {
       return jaHeadsign(lirrSelectedHeadsign, lirrSelectedHeadsign);
     }
-    return null;
+    if (lirrDestinationMode === 'outbound') return '郊外方面';
+    return '都心方面';
   })();
 
   $: jaStopTitle = (() => {
