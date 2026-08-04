@@ -7,7 +7,7 @@ import time
 
 PROC_ROOT = os.environ.get("PROC_ROOT", "/host/proc")
 DISK_PATH = os.environ.get("DISK_PATH", "/host")
-DOCKER_SOCKET = os.environ.get("DOCKER_SOCKET", "/var/run/docker.sock")
+DOCKER_HOST = os.environ.get("DOCKER_HOST", "tcp://docker-socket-proxy:2375")
 LOG_PATH = os.environ.get("LOG_PATH", "/logs/monitor.jsonl")
 INTERVAL = int(os.environ.get("MONITOR_INTERVAL_SECONDS", "60"))
 
@@ -115,19 +115,43 @@ def read_network(proc_root: str = PROC_ROOT) -> dict | None:
     return {"net_rx_mb": net_rx_mb, "net_tx_mb": net_tx_mb}
 
 
-def _http_get_unix(socket_path: str, path: str) -> bytes:
-    """Perform a raw HTTP GET over a Unix domain socket. Returns response body."""
-    with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
-        sock.connect(socket_path)
-        request = f"GET {path} HTTP/1.0\r\nHost: localhost\r\n\r\n"
-        sock.sendall(request.encode())
+def _http_get(docker_host: str, path: str) -> bytes:
+    """Perform a raw HTTP GET over TCP or Unix socket. Returns response body.
 
-        chunks = []
-        while True:
-            chunk = sock.recv(4096)
-            if not chunk:
-                break
-            chunks.append(chunk)
+    Transport selection:
+      - docker_host starts with 'tcp://'  → TCP socket (AF_INET)
+      - docker_host starts with 'unix://' → Unix socket, path after 'unix://'
+      - anything else                     → Unix socket, docker_host is the path
+    """
+    if docker_host.startswith("tcp://"):
+        address = docker_host[6:]  # strip "tcp://"
+        host, port_str = address.rsplit(":", 1)
+        port = int(port_str)
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.connect((host, port))
+            request = f"GET {path} HTTP/1.0\r\nHost: {host}\r\n\r\n"
+            sock.sendall(request.encode())
+            chunks = []
+            while True:
+                chunk = sock.recv(4096)
+                if not chunk:
+                    break
+                chunks.append(chunk)
+    else:
+        if docker_host.startswith("unix://"):
+            socket_path = docker_host[7:]  # strip "unix://"
+        else:
+            socket_path = docker_host
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
+            sock.connect(socket_path)
+            request = f"GET {path} HTTP/1.0\r\nHost: localhost\r\n\r\n"
+            sock.sendall(request.encode())
+            chunks = []
+            while True:
+                chunk = sock.recv(4096)
+                if not chunk:
+                    break
+                chunks.append(chunk)
 
     raw = b"".join(chunks)
     # Split headers from body
@@ -137,9 +161,9 @@ def _http_get_unix(socket_path: str, path: str) -> bytes:
     return raw[header_end + 4:]
 
 
-def read_containers(socket_path: str = DOCKER_SOCKET) -> dict:
+def read_containers(docker_host: str = DOCKER_HOST) -> dict:
     try:
-        body = _http_get_unix(socket_path, "/v1.43/containers/json")
+        body = _http_get(docker_host, "/v1.43/containers/json")
         containers = json.loads(body)
     except Exception as e:
         print(f"WARNING: could not list containers: {e}", file=sys.stderr)
@@ -151,7 +175,7 @@ def read_containers(socket_path: str = DOCKER_SOCKET) -> dict:
         name = container["Names"][0].lstrip("/")
 
         try:
-            stats_body = _http_get_unix(socket_path, f"/v1.43/containers/{cid}/stats?stream=false")
+            stats_body = _http_get(docker_host, f"/v1.43/containers/{cid}/stats?stream=false")
             stats = json.loads(stats_body)
         except Exception as e:
             print(f"WARNING: could not get stats for {name}: {e}", file=sys.stderr)

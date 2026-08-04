@@ -10,22 +10,38 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
     restart: always
+    # mem_limit/cpus: placeholder pending docker-stats-log.sh measurement period
+    # (see specs/security-hardening-overarching.md Phase A0/C2).
+    mem_limit: 512m
+    cpus: 0.5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
-  oba_bundler:
+  oba_app_base:
     build:
-      context: https://github.com/OneBusAway/onebusaway-docker.git#main:bundler
-    volumes:
-      - ./oba-server/bundle:/bundle
-    environment:
-      - GTFS_URL=${GTFS_URL}
-    depends_on:
-      - oba_database
+      context: https://github.com/OneBusAway/onebusaway-docker.git#main:oba
+    image: transit-board-oba_app_base
+    profiles:
+      - build
+    # mem_limit/cpus: placeholder pending docker-stats-log.sh measurement period
+    # (see specs/security-hardening-overarching.md Phase A0/C2).
+    mem_limit: 512m
+    cpus: 0.5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   oba_app:
     container_name: oba_app
     hostname: oba-app
     build:
-      context: https://github.com/OneBusAway/onebusaway-docker.git#main:oba
+      context: ./oba-app
+      dockerfile: Dockerfile
     environment:
       - JDBC_URL=${JDBC_URL:-jdbc:mysql://oba_database:3306/oba_database}
       - JDBC_DRIVER=com.mysql.cj.jdbc.Driver
@@ -39,6 +55,16 @@ services:
     depends_on:
       - oba_database
     restart: always
+    # mem_limit: may need raising above 768m if bundle rebuilds OOM-kill near this ceiling;
+    # monitor docker-stats-log.sh data during a rebuild before finalizing.
+    # (see specs/security-hardening-overarching.md Phase A0/C2).
+    mem_limit: 768m
+    cpus: 0.75
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   cli:
     build:
@@ -50,6 +76,15 @@ services:
       - oba_app
     profiles:
       - cli
+    # mem_limit/cpus: placeholder pending docker-stats-log.sh measurement period
+    # (see specs/security-hardening-overarching.md Phase A0/C2).
+    mem_limit: 128m
+    cpus: 0.25
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   transit-board-api:
     build:
@@ -62,6 +97,15 @@ services:
     depends_on:
       - oba_app
     restart: always
+    # mem_limit/cpus: placeholder pending docker-stats-log.sh measurement period
+    # (see specs/security-hardening-overarching.md Phase A0/C2).
+    mem_limit: 128m
+    cpus: 0.25
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   frontend:
     build:
@@ -72,13 +116,21 @@ services:
     depends_on:
       - transit-board-api
     restart: always
+    # mem_limit/cpus: set in docker-compose.override.yml for deployment environments
+    # that use Caddy; also set here as a baseline for standalone runs.
+    mem_limit: 64m
+    cpus: 0.1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   gtfs_updater:
     build: ./gtfs-updater
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
       - ./oba-server/bundle:/bundle
-      - .:/compose:ro
+      - ./logs:/logs
     environment:
       - GTFS_FEED_URL=https://rrgtfsfeeds.s3.amazonaws.com/gtfslirr.zip
       - GTFS_UPDATE_HOUR=5
@@ -89,19 +141,80 @@ services:
     depends_on:
       - oba_database
     restart: unless-stopped
+    # mem_limit/cpus: placeholder pending docker-stats-log.sh measurement period
+    # (see specs/security-hardening-overarching.md Phase A0/C2).
+    mem_limit: 128m
+    cpus: 0.25
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   monitor:
     build: ./monitor
     volumes:
       - /proc:/host/proc:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./logs:/logs
     environment:
       - MONITOR_INTERVAL_SECONDS=60
+      - DOCKER_HOST=tcp://docker-socket-proxy:2375
+    depends_on:
+      - docker-socket-proxy
     restart: unless-stopped
+    networks:
+      - default
+      - docker-proxy-internal
+    # mem_limit/cpus: placeholder pending docker-stats-log.sh measurement period
+    # (see specs/security-hardening-overarching.md Phase A0/C2).
+    mem_limit: 64m
+    cpus: 0.1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  docker-socket-proxy:
+    image: tecnativa/docker-socket-proxy:0.3
+    container_name: transit-board-docker-proxy
+    restart: unless-stopped
+    environment:
+      CONTAINERS: 1
+      POST: 0
+      NETWORKS: 0
+      SERVICES: 0
+      TASKS: 0
+      VOLUMES: 0
+      IMAGES: 0
+      INFO: 0
+      EVENTS: 0
+      AUTH: 0
+      SECRETS: 0
+      BUILD: 0
+      COMMIT: 0
+      CONFIGS: 0
+      DISTRIBUTION: 0
+      EXEC: 0
+      GRPC: 0
+      LOG_LEVEL: warning
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - docker-proxy-internal
+    mem_limit: 32m
+    cpus: 0.05
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   mysql-data:
 
 networks:
   default: {}
+  docker-proxy-internal:
+    driver: bridge
+    internal: true

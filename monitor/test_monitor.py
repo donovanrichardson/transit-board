@@ -179,9 +179,80 @@ def _make_fake_socket_response(*bodies):
     return iter(FakeSocket(b) for b in bodies)
 
 
+class TestHttpGet(unittest.TestCase):
+    """Tests for the _http_get transport abstraction."""
+
+    def test_http_get_tcp_success(self):
+        """TCP transport correctly sends an HTTP GET and returns the response body."""
+        body = b'{"result": "ok"}'
+        http_response = (
+            f"HTTP/1.1 200 OK\r\nContent-Length: {len(body)}\r\n\r\n".encode() + body
+        )
+        fake_sock = MagicMock()
+        fake_sock.recv.side_effect = _chunked_recv(http_response)
+        fake_sock.__enter__ = MagicMock(return_value=fake_sock)
+        fake_sock.__exit__ = MagicMock(return_value=False)
+
+        with patch("socket.socket", return_value=fake_sock) as mock_socket:
+            result = monitor._http_get("tcp://docker-socket-proxy:2375", "/some/path")
+
+        mock_socket.assert_called_once_with(socket.AF_INET, socket.SOCK_STREAM)
+        fake_sock.connect.assert_called_once_with(("docker-socket-proxy", 2375))
+        self.assertEqual(result, body)
+
+    def test_http_get_unix_still_works(self):
+        """Unix socket path still works when docker_host is a filesystem path."""
+        body = b'unix response'
+        http_response = b"HTTP/1.1 200 OK\r\n\r\n" + body
+        fake_sock = MagicMock()
+        fake_sock.recv.side_effect = [http_response, b""]
+        fake_sock.__enter__ = MagicMock(return_value=fake_sock)
+        fake_sock.__exit__ = MagicMock(return_value=False)
+
+        with patch("socket.socket", return_value=fake_sock) as mock_socket:
+            result = monitor._http_get("/var/run/docker.sock", "/some/path")
+
+        mock_socket.assert_called_once_with(socket.AF_UNIX, socket.SOCK_STREAM)
+        fake_sock.connect.assert_called_once_with("/var/run/docker.sock")
+        self.assertEqual(result, body)
+
+
+class TestDockerHostParsing(unittest.TestCase):
+    """Tests that docker_host strings are parsed into the correct transport."""
+
+    def _run_http_get(self, docker_host):
+        body = b'hello'
+        http_response = b"HTTP/1.1 200 OK\r\n\r\n" + body
+        fake_sock = MagicMock()
+        fake_sock.recv.side_effect = [http_response, b""]
+        fake_sock.__enter__ = MagicMock(return_value=fake_sock)
+        fake_sock.__exit__ = MagicMock(return_value=False)
+        with patch("socket.socket", return_value=fake_sock) as mock_socket:
+            monitor._http_get(docker_host, "/v1.43/containers/json")
+        return mock_socket, fake_sock
+
+    def test_docker_host_parsing(self):
+        """tcp://, unix://, and filesystem paths all route to the right transport."""
+        # tcp:// → AF_INET, connect to (host, port) tuple
+        mock_socket, fake_sock = self._run_http_get("tcp://docker-socket-proxy:2375")
+        mock_socket.assert_called_once_with(socket.AF_INET, socket.SOCK_STREAM)
+        fake_sock.connect.assert_called_once_with(("docker-socket-proxy", 2375))
+
+        # unix:// scheme → AF_UNIX, connect to path string
+        mock_socket, fake_sock = self._run_http_get("unix:///var/run/docker.sock")
+        mock_socket.assert_called_once_with(socket.AF_UNIX, socket.SOCK_STREAM)
+        fake_sock.connect.assert_called_once_with("/var/run/docker.sock")
+
+        # Bare filesystem path → AF_UNIX, connect to path string
+        mock_socket, fake_sock = self._run_http_get("/var/run/docker.sock")
+        mock_socket.assert_called_once_with(socket.AF_UNIX, socket.SOCK_STREAM)
+        fake_sock.connect.assert_called_once_with("/var/run/docker.sock")
+
+
 class TestReadContainers(unittest.TestCase):
     def test_read_containers_no_socket(self):
-        result = monitor.read_containers(socket_path="/nonexistent/docker.sock")
+        # Unix path that doesn't exist → graceful empty dict
+        result = monitor.read_containers(docker_host="/nonexistent/docker.sock")
         self.assertEqual(result, {})
 
     def test_read_containers_parses_stats(self):
@@ -208,7 +279,7 @@ class TestReadContainers(unittest.TestCase):
             _make_context_manager(fake_sockets[1]),
             _make_context_manager(fake_sockets[2]),
         ]):
-            result = monitor.read_containers(socket_path="/fake/docker.sock")
+            result = monitor.read_containers(docker_host="/fake/docker.sock")
 
         self.assertIn("oba_app", result)
         self.assertIn("oba_database", result)
@@ -222,6 +293,46 @@ class TestReadContainers(unittest.TestCase):
         # cpu_pct = (4000000/500000000)*4*100 = 3.2
         self.assertEqual(result["oba_database"]["cpu_pct"], 3.2)
         self.assertEqual(result["oba_database"]["ram_mb"], 327155712 // 1048576)  # 312
+
+    def test_http_get_tcp_connection_refused(self):
+        """Connection refused to TCP proxy is handled gracefully: returns empty dict."""
+        with patch("socket.socket", side_effect=ConnectionRefusedError("Connection refused")):
+            result = monitor.read_containers(docker_host="tcp://docker-socket-proxy:2375")
+        self.assertEqual(result, {})
+
+    def test_read_containers_with_tcp_transport(self):
+        """read_containers() uses TCP (AF_INET) when docker_host is a tcp:// URL."""
+        bodies = [
+            FAKE_CONTAINERS_JSON,
+            FAKE_STATS_OBA_APP,
+            FAKE_STATS_OBA_DB,
+        ]
+
+        fake_sockets = []
+        for body in bodies:
+            encoded = body.encode()
+            http_response = (
+                f"HTTP/1.1 200 OK\r\nContent-Length: {len(encoded)}\r\n\r\n"
+            ).encode() + encoded
+            s = MagicMock()
+            s.recv.side_effect = _chunked_recv(http_response)
+            s.__enter__ = lambda self: self
+            s.__exit__ = MagicMock(return_value=False)
+            fake_sockets.append(s)
+
+        with patch("socket.socket", side_effect=[
+            _make_context_manager(fake_sockets[0]),
+            _make_context_manager(fake_sockets[1]),
+            _make_context_manager(fake_sockets[2]),
+        ]) as mock_socket:
+            result = monitor.read_containers(docker_host="tcp://docker-socket-proxy:2375")
+
+        # Verify TCP sockets were created (AF_INET, not AF_UNIX)
+        for call in mock_socket.call_args_list:
+            self.assertEqual(call.args, (socket.AF_INET, socket.SOCK_STREAM))
+
+        self.assertIn("oba_app", result)
+        self.assertIn("oba_database", result)
 
 
 def _chunked_recv(data, chunk_size=4096):
