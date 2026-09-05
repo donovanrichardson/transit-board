@@ -68,11 +68,7 @@ transit-board/
 cp .env.example .env
 ```
 
-Edit `.env` and set your GTFS feed URL:
-
-```bash
-GTFS_URL=https://your-agency.gov/gtfs.zip
-```
+Edit `.env` and set required values (database passwords, API key, and the GTFS feed URL in `GTFS_FEED_URL`).
 
 ### 2. Build the images
 
@@ -211,10 +207,12 @@ The `OBA_BASE_URL` environment variable can be used instead of `--base-url`. The
 
 ## GTFS data
 
-GTFS feeds expire on a schedule set by each agency (weekly, monthly, or ad hoc). When the feed expires, OBA continues to work but the data becomes stale. To refresh:
+GTFS feeds expire on a schedule set by each agency (weekly, monthly, or ad hoc). When the feed expires, OBA continues to work but the data becomes stale. The `gtfs_updater` service checks for feed changes automatically each day (configurable via `GTFS_UPDATE_HOUR`) and rebuilds the bundle when a new feed is detected.
 
-1. Update `GTFS_URL` in `.env` if the URL has changed
-2. Re-run the bundler: `docker compose up oba_bundler`
+To trigger a manual refresh:
+
+1. Update `GTFS_FEED_URL` in `.env` if the feed URL has changed
+2. Re-run the bundler: `docker compose run --rm -e GTFS_ZIP_FILENAME=gtfs_staging.zip oba_bundler`
 3. Restart the server: `docker compose restart oba_app`
 
 ---
@@ -223,7 +221,8 @@ GTFS feeds expire on a schedule set by each agency (weekly, monthly, or ad hoc).
 
 | Variable | Default | Description |
 |---|---|---|
-| `GTFS_URL` | — | **Required.** URL of your agency's GTFS zip |
+| `GTFS_FEED_URL` | `https://rrgtfsfeeds.s3.amazonaws.com/gtfslirr.zip` | URL of your agency's GTFS zip (used by `gtfs_updater` to download and check for updates) |
+| `GTFS_UPDATE_HOUR` | `5` | Hour (ET) at which `gtfs_updater` checks for a new feed each day |
 | `JDBC_URL` | `jdbc:mysql://oba_database:3306/oba_database` | Database connection string |
 | `JDBC_USER` | `oba` | Database user |
 | `JDBC_PASSWORD` | | Database password (must match `MYSQL_PASSWORD` in `.env`) |
