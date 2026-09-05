@@ -70,6 +70,18 @@ cp .env.example .env
 
 Edit `.env` and set required values (database passwords, API key, and the GTFS feed URL in `GTFS_FEED_URL`).
 
+**For this personal deployment**, `MYSQL_ROOT_PASSWORD`, `JDBC_PASSWORD`, and
+`OBA_API_KEY` are stored in `pass` rather than typed into `.env` by hand. Run
+`./generate-env.sh` to pull them from `pass` and write them into `.env` — do
+this once after cloning, and again any time one of the underlying `pass`
+entries is rotated. `docker-compose.yml` uses Compose's `${VAR:?...}`
+required-variable syntax for all three, so a plain `docker compose up` fails
+immediately with a clear error if `.env` doesn't have them, instead of
+silently starting with blank secrets. This is the pattern to copy for any
+future `pass`-backed secret in this repo (or others) — not a per-shell
+`.envrc` export, which only works if the invoking shell happens to have
+`direnv` active (see `lifeos-poc`#19).
+
 ### 2. Build the images
 
 ```bash

@@ -3,10 +3,10 @@ services:
     image: mysql:8.4
     container_name: oba_database
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD not set - run ./generate-env.sh first}
       MYSQL_DATABASE: oba_database
       MYSQL_USER: ${JDBC_USER:-oba}
-      MYSQL_PASSWORD: ${JDBC_PASSWORD}
+      MYSQL_PASSWORD: ${JDBC_PASSWORD:?JDBC_PASSWORD not set - run ./generate-env.sh first}
     volumes:
       - mysql-data:/var/lib/mysql
     restart: always
@@ -46,8 +46,8 @@ services:
       - JDBC_URL=${JDBC_URL:-jdbc:mysql://oba_database:3306/oba_database}
       - JDBC_DRIVER=com.mysql.cj.jdbc.Driver
       - JDBC_USER=${JDBC_USER:-oba}
-      - JDBC_PASSWORD=${JDBC_PASSWORD}
-      - TEST_API_KEY=${OBA_API_KEY}
+      - JDBC_PASSWORD=${JDBC_PASSWORD:?JDBC_PASSWORD not set - run ./generate-env.sh first}
+      - TEST_API_KEY=${OBA_API_KEY:?OBA_API_KEY not set - run ./generate-env.sh first}
     volumes:
       - ./oba-server/bundle:/bundle
     ports:
@@ -93,7 +93,7 @@ services:
     environment:
       - OBA_BASE_URL=http://oba-app:8080
       - PORT=4000
-      - OBA_API_KEY=${OBA_API_KEY}
+      - OBA_API_KEY=${OBA_API_KEY:?OBA_API_KEY not set - run ./generate-env.sh first}
     depends_on:
       - oba_app
     restart: always
@@ -136,7 +136,7 @@ services:
       - GTFS_UPDATE_HOUR=5
       - MYSQL_HOST=oba_database
       - MYSQL_USER=${JDBC_USER:-oba}
-      - MYSQL_PASSWORD=${JDBC_PASSWORD}
+      - MYSQL_PASSWORD=${JDBC_PASSWORD:?JDBC_PASSWORD not set - run ./generate-env.sh first}
       - MYSQL_DATABASE=oba_database
     depends_on:
       - oba_database
