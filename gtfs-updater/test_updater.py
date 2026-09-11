@@ -1,3 +1,4 @@
+import csv
 import hashlib
 import inspect
 import io
@@ -636,6 +637,53 @@ class TestWriteEvent(unittest.TestCase):
             datetime.fromisoformat(ts.replace("Z", "+00:00"))
         finally:
             os.unlink(tmp_path)
+
+
+class TestCheckHeadsignCoverage(unittest.TestCase):
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir)
+
+    def _write_json(self, data):
+        path = os.path.join(self.tmpdir, "headsign-abbreviations.json")
+        with open(path, "w") as f:
+            json.dump(data, f)
+        return path
+
+    def _write_trips(self, headsigns):
+        path = os.path.join(self.tmpdir, "trips.txt")
+        with open(path, "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(["route_id", "service_id", "trip_id", "trip_headsign"])
+            for h in headsigns:
+                writer.writerow(["R1", "S1", "T1", h])
+        return path
+
+    def test_check_headsign_coverage_all_covered(self):
+        json_path = self._write_json({"A": "AA", "B": "BB"})
+        trips_path = self._write_trips(["A", "B"])
+        with patch("updater.write_event") as mock_write:
+            updater.check_headsign_coverage(json_path=json_path, trips_path=trips_path)
+        mock_write.assert_called_once()
+        event = mock_write.call_args[0][0]
+        self.assertEqual(event["event"], "headsign_coverage")
+        self.assertEqual(event["missing_headsigns"], [])
+        self.assertEqual(event["total_gtfs_headsigns"], 2)
+        self.assertEqual(event["total_mapped"], 2)
+
+    def test_check_headsign_coverage_some_missing(self):
+        json_path = self._write_json({"A": "AA", "B": "BB"})
+        trips_path = self._write_trips(["A", "B", "C", "D"])
+        with patch("updater.write_event") as mock_write:
+            updater.check_headsign_coverage(json_path=json_path, trips_path=trips_path)
+        mock_write.assert_called_once()
+        event = mock_write.call_args[0][0]
+        self.assertEqual(event["event"], "headsign_coverage")
+        self.assertEqual(event["missing_headsigns"], ["C", "D"])
+        self.assertEqual(event["total_gtfs_headsigns"], 4)
+        self.assertEqual(event["total_mapped"], 2)
 
 
 if __name__ == "__main__":
