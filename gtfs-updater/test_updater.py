@@ -685,6 +685,31 @@ class TestCheckHeadsignCoverage(unittest.TestCase):
         self.assertEqual(event["total_gtfs_headsigns"], 4)
         self.assertEqual(event["total_mapped"], 2)
 
+    def test_check_headsign_coverage_skips_empty_headsigns(self):
+        json_path = self._write_json({"A": "AA"})
+        trips_path = self._write_trips(["A", "", ""])
+        with patch("updater.write_event") as mock_write:
+            updater.check_headsign_coverage(json_path=json_path, trips_path=trips_path)
+        event = mock_write.call_args[0][0]
+        self.assertEqual(event["missing_headsigns"], [])
+        self.assertEqual(event["total_gtfs_headsigns"], 1)
+
+    def test_check_headsign_coverage_deduplicates_headsigns(self):
+        json_path = self._write_json({"A": "AA"})
+        trips_path = self._write_trips(["A"] * 100)
+        with patch("updater.write_event") as mock_write:
+            updater.check_headsign_coverage(json_path=json_path, trips_path=trips_path)
+        event = mock_write.call_args[0][0]
+        self.assertEqual(event["total_gtfs_headsigns"], 1)
+
+    def test_check_headsign_coverage_missing_headsigns_sorted(self):
+        json_path = self._write_json({})
+        trips_path = self._write_trips(["Zebra", "Alpha", "Middle"])
+        with patch("updater.write_event") as mock_write:
+            updater.check_headsign_coverage(json_path=json_path, trips_path=trips_path)
+        event = mock_write.call_args[0][0]
+        self.assertEqual(event["missing_headsigns"], ["Alpha", "Middle", "Zebra"])
+
 
 if __name__ == "__main__":
     unittest.main()
