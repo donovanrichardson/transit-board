@@ -1,3 +1,4 @@
+import csv
 import hashlib
 import json
 import logging
@@ -42,6 +43,11 @@ REBUILD_RESULT_PATH = "/bundle/.rebuild_result.json"
 REBUILD_POLL_INTERVAL = 10   # seconds between checks for result marker
 REBUILD_TIMEOUT = 600        # seconds (10 minutes) to wait for watcher to complete
 
+HEADSIGN_ABBREVIATIONS_PATH = os.environ.get(
+    "HEADSIGN_ABBREVIATIONS_PATH", "/config/headsign-abbreviations.json"
+)
+TRIPS_PATH = "/bundle/gtfs-out/trips.txt"
+
 
 def write_event(event: dict, log_path: str | None = None) -> None:
     path = log_path if log_path is not None else LOG_PATH
@@ -51,6 +57,56 @@ def write_event(event: dict, log_path: str | None = None) -> None:
             f.flush()
     except OSError as exc:
         logger.warning("Failed to write JSONL event to %s: %s", path, exc)
+
+
+def check_headsign_coverage(
+    json_path: str | None = None,
+    trips_path: str | None = None,
+) -> None:
+    jp = json_path if json_path is not None else HEADSIGN_ABBREVIATIONS_PATH
+    tp = trips_path if trips_path is not None else TRIPS_PATH
+
+    try:
+        with open(jp) as f:
+            data = json.load(f)
+        if not isinstance(data, dict):
+            logger.warning("Headsign abbreviations JSON is not a dict: %s", jp)
+            return
+    except FileNotFoundError:
+        logger.warning("Headsign abbreviations JSON not found: %s", jp)
+        return
+    except (json.JSONDecodeError, OSError) as exc:
+        logger.warning("Failed to read headsign abbreviations JSON %s: %s", jp, exc)
+        return
+
+    known_headsigns = set(data.keys())
+
+    try:
+        with open(tp, newline="") as f:
+            reader = csv.DictReader(f)
+            if "trip_headsign" not in (reader.fieldnames or []):
+                logger.warning("trips.txt has no trip_headsign column: %s", tp)
+                return
+            gtfs_headsigns = {
+                row["trip_headsign"]
+                for row in reader
+                if row["trip_headsign"]
+            }
+    except FileNotFoundError:
+        logger.warning("trips.txt not found: %s", tp)
+        return
+    except OSError as exc:
+        logger.warning("Failed to read trips.txt %s: %s", tp, exc)
+        return
+
+    missing = sorted(gtfs_headsigns - known_headsigns)
+    write_event({
+        "ts": _now_ts(),
+        "event": "headsign_coverage",
+        "missing_headsigns": missing,
+        "total_gtfs_headsigns": len(gtfs_headsigns),
+        "total_mapped": len(known_headsigns),
+    })
 
 
 def compute_checksum(path: str) -> str:
@@ -285,6 +341,7 @@ def run_update_check(conn: pymysql.Connection, feed_url: str) -> None:
                 "feed_url": feed_url,
                 "sha256": new_sha,
             })
+            check_headsign_coverage()
             cleanup_marker_files()
             logger.info("GTFS update complete")
         else:
