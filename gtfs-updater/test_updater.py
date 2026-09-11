@@ -710,6 +710,32 @@ class TestCheckHeadsignCoverage(unittest.TestCase):
         event = mock_write.call_args[0][0]
         self.assertEqual(event["missing_headsigns"], ["Alpha", "Middle", "Zebra"])
 
+    def test_check_headsign_coverage_json_missing(self):
+        missing_path = os.path.join(self.tmpdir, "does-not-exist.json")
+        trips_path = self._write_trips(["A"])
+        with patch("updater.write_event") as mock_write, \
+             self.assertLogs("updater", level="WARNING"):
+            updater.check_headsign_coverage(json_path=missing_path, trips_path=trips_path)
+        mock_write.assert_not_called()
+
+    def test_check_headsign_coverage_trips_missing(self):
+        json_path = self._write_json({"A": "AA"})
+        missing_path = os.path.join(self.tmpdir, "does-not-exist.txt")
+        with patch("updater.write_event") as mock_write, \
+             self.assertLogs("updater", level="WARNING"):
+            updater.check_headsign_coverage(json_path=json_path, trips_path=missing_path)
+        mock_write.assert_not_called()
+
+    def test_check_headsign_coverage_json_malformed(self):
+        json_path = os.path.join(self.tmpdir, "bad.json")
+        with open(json_path, "w") as f:
+            f.write("{not valid json")
+        trips_path = self._write_trips(["A"])
+        with patch("updater.write_event") as mock_write, \
+             self.assertLogs("updater", level="WARNING"):
+            updater.check_headsign_coverage(json_path=json_path, trips_path=trips_path)
+        mock_write.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()
