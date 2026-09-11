@@ -21,48 +21,9 @@ export const CITY_TERMINALS = [
   'Long Island City',
 ];
 
+import headsignAbbreviations from './headsign-abbreviations.json';
+
 /**
  * Abbreviation map for LIRR headsigns displayed in MinuteCell.
  */
-export const HEADSIGN_ABBREVIATIONS = {
-  'Amagansett': 'AGT',
-  'Atlantic Terminal': 'ATL',
-  'Babylon': 'BAB',
-  'Far Rockaway': 'FRY',
-  'Floral Park': 'FPK',
-  'Freeport': 'FPT',
-  'Grand Central': 'GCT',
-  'Great Neck': 'GNK',
-  'Greenport': 'GPT',
-  'Hampton Bays': 'HBY',
-  'Hempstead': 'HEM',
-  'Hicksville': 'HVL',
-  'Hunterspoint Avenue': 'HPA',
-  'Huntington': 'HUN',
-  'Jamaica': 'JAM',
-  'Long Beach': 'LBH',
-  'Long Island City': 'LIC',
-  'Massapequa': 'MQA',
-  'Montauk': 'MTK',
-  'Oyster Bay': 'OBY',
-  'Patchogue': 'PGE',
-  'Penn Station': 'NYP',
-  'Port Jefferson': 'PJN',
-  'Port Washington': 'PWS',
-  'Riverhead': 'RHD',
-  'Ronkonkoma': 'RON',
-  'Seaford': 'SFD',
-  'Shinnecock Hills': 'SHC',
-  'Smithtown': 'STN',
-  'Southampton': 'SHN',
-  'Speonk': 'SPK',
-  'Wantagh': 'WGH',
-  'West Hempstead': 'WHD',
-  // Bus variants — same abbr as base
-  'Huntington (Bus)': 'HUN',
-  'Montauk (Bus)': 'MTK',
-  'Patchogue (Bus)': 'PGE',
-  'Port Jefferson (Bus)': 'PJN',
-  'Smithtown (Bus)': 'STN',
-  'Southampton (Bus)': 'SHN',
-};
+export const HEADSIGN_ABBREVIATIONS = headsignAbbreviations;

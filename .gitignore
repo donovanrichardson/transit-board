@@ -5,6 +5,7 @@ departure-board/target/
 transit-board-api/target/
 logs/monitor.jsonl
 logs/gtfs_updater.jsonl
+logs/.headsign-coverage-last-read
 .claude/
 frontend/node_modules/
 frontend/dist/

@@ -131,6 +131,7 @@ services:
     volumes:
       - ./oba-server/bundle:/bundle
       - ./logs:/logs
+      - ./frontend/src/lib/headsign-abbreviations.json:/config/headsign-abbreviations.json:ro
     environment:
       - GTFS_FEED_URL=https://rrgtfsfeeds.s3.amazonaws.com/gtfslirr.zip
       - GTFS_UPDATE_HOUR=5
