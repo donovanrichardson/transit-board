@@ -553,6 +553,76 @@ class TestUpdateCheck(unittest.TestCase):
         for name in removed:
             self.assertFalse(hasattr(updater, name), f"updater.{name} should not exist")
 
+    def test_update_check_calls_coverage_after_success(self):
+        old_sha = "a" * 64
+        data = b"new zip content"
+        new_sha = hashlib.sha256(data).hexdigest()
+        conn = self._make_conn(stored_sha=old_sha)
+        _, fake_download = self._setup_download(data)
+
+        nonce = "abc123def456"
+        result = {
+            "nonce": nonce, "success": True, "sha256": new_sha,
+            "error": "", "ts": "2026-07-28T00:00:00Z",
+        }
+
+        with patch("updater.download_feed", side_effect=fake_download), \
+             patch("updater.get_latest_checksum", return_value=old_sha), \
+             patch("updater.request_rebuild", return_value=nonce), \
+             patch("updater.wait_for_rebuild_result", return_value=result), \
+             patch("updater.save_checksum"), \
+             patch("updater.cleanup_marker_files"), \
+             patch("updater.write_event"), \
+             patch("shutil.copy2"), \
+             patch("shutil.move"), \
+             patch("updater.check_headsign_coverage") as mock_coverage, \
+             self.assertLogs("updater", level="INFO"):
+            updater.run_update_check(conn, "https://example.com/feed.zip")
+
+        mock_coverage.assert_called_once()
+
+    def test_update_check_skips_coverage_on_failure(self):
+        old_sha = "a" * 64
+        data = b"new content"
+        conn = self._make_conn(stored_sha=old_sha)
+        _, fake_download = self._setup_download(data)
+
+        nonce = "failnonce1234"
+        result = {
+            "nonce": nonce, "success": False, "sha256": "b" * 64,
+            "error": "build_failed_exit_1_bundle_restored", "ts": "2026-07-28T00:00:00Z",
+        }
+
+        with patch("updater.download_feed", side_effect=fake_download), \
+             patch("updater.get_latest_checksum", return_value=old_sha), \
+             patch("updater.request_rebuild", return_value=nonce), \
+             patch("updater.wait_for_rebuild_result", return_value=result), \
+             patch("updater.save_checksum"), \
+             patch("updater.cleanup_marker_files"), \
+             patch("updater.write_event"), \
+             patch("shutil.copy2"), \
+             patch("shutil.move"), \
+             patch("updater.check_headsign_coverage") as mock_coverage, \
+             self.assertLogs("updater", level="ERROR"):
+            updater.run_update_check(conn, "https://example.com/feed.zip")
+
+        mock_coverage.assert_not_called()
+
+    def test_update_check_skips_coverage_on_unchanged(self):
+        data = b"same zip content"
+        sha = hashlib.sha256(data).hexdigest()
+        conn = self._make_conn(stored_sha=sha)
+        _, fake_download = self._setup_download(data)
+
+        with patch("updater.download_feed", side_effect=fake_download), \
+             patch("updater.get_latest_checksum", return_value=sha), \
+             patch("updater.write_event"), \
+             patch("updater.check_headsign_coverage") as mock_coverage, \
+             self.assertLogs("updater", level="INFO"):
+            updater.run_update_check(conn, "https://example.com/feed.zip")
+
+        mock_coverage.assert_not_called()
+
 
 class TestWriteEvent(unittest.TestCase):
     def test_write_event_creates_file(self):
