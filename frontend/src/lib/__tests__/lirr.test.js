@@ -37,4 +37,73 @@ describe('lirr.HEADSIGN_ABBREVIATIONS', () => {
   it('maps Grand Central to GCT', () => {
     expect(HEADSIGN_ABBREVIATIONS['Grand Central']).toBe('GCT');
   });
+
+  it('has a defined entry for every live GTFS headsign', () => {
+    const liveHeadsigns = [
+      'Amagansett',
+      'Atlantic Terminal',
+      'Babylon',
+      'Babylon (Bus)',
+      'Central Islip',
+      'Central Islip (Bus)',
+      'Far Rockaway',
+      'Farmingdale',
+      'Floral Park',
+      'Freeport',
+      'Glen Cove (Bus)',
+      'Grand Central',
+      'Great Neck',
+      'Greenport',
+      'Greenport (Bus)',
+      'Greenvale (Bus)',
+      'Hampton Bays',
+      'Hempstead',
+      'Hicksville',
+      'Hunterspoint Avenue',
+      'Huntington',
+      'Huntington (Bus)',
+      'Jamaica',
+      'Long Beach',
+      'Long Island City',
+      'Massapequa',
+      'Mineola (Bus)',
+      'Montauk',
+      'Montauk (Bus)',
+      'Oyster Bay',
+      'Oyster Bay (Bus)',
+      'Patchogue',
+      'Patchogue (Bus)',
+      'Penn Station',
+      'Port Jefferson',
+      'Port Jefferson (Bus)',
+      'Port Washington',
+      'Riverhead (Bus)',
+      'Ronkonkoma',
+      'Ronkonkoma (Bus)',
+      'Seaford',
+      'Shinnecock Hills',
+      'Smithtown',
+      'Smithtown (Bus)',
+      'Southampton',
+      'Southampton (Bus)',
+      'Speonk',
+      'Speonk (Bus)',
+      'Wantagh',
+      'West Hempstead',
+    ];
+    for (const headsign of liveHeadsigns) {
+      expect(HEADSIGN_ABBREVIATIONS[headsign], headsign).toBeDefined();
+    }
+  });
+
+  it('every (Bus) headsign value matches its base station value when base exists', () => {
+    for (const key of Object.keys(HEADSIGN_ABBREVIATIONS)) {
+      if (key.endsWith(' (Bus)')) {
+        const baseKey = key.replace(' (Bus)', '');
+        if (baseKey in HEADSIGN_ABBREVIATIONS) {
+          expect(HEADSIGN_ABBREVIATIONS[key], key).toBe(HEADSIGN_ABBREVIATIONS[baseKey]);
+        }
+      }
+    }
+  });
 });
