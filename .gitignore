@@ -15,3 +15,5 @@ postmortem-*.md
 docker-compose.override.yml
 about.md
 spec.md
+
+.claude/worktrees/
