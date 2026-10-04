@@ -82,6 +82,8 @@ public class StopsApiHandler implements HttpHandler {
 
             String json = objectMapper.writeValueAsString(responseBody);
             sendResponse(exchange, 200, json);
+        } catch (IllegalArgumentException e) {
+            sendError(exchange, 400, "Invalid agency ID");
         } catch (ObaClient.ObaClientException e) {
             sendError(exchange, 502, "Could not reach OBA API: " + e.getMessage());
         } catch (Exception e) {
