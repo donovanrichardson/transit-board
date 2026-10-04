@@ -807,5 +807,129 @@ class TestCheckHeadsignCoverage(unittest.TestCase):
         mock_write.assert_not_called()
 
 
+class TestCheckIdAllowlist(unittest.TestCase):
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir)
+
+    def _write_csv(self, filename, header, rows):
+        path = os.path.join(self.tmpdir, filename)
+        with open(path, "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(header)
+            for row in rows:
+                writer.writerow(row)
+        return path
+
+    def test_invalid_stop_id_listed_under_stops(self):
+        """Test 13: fixture with one valid and one invalid stop ID."""
+        stops_path = self._write_csv(
+            "stops.txt",
+            ["stop_id", "stop_name"],
+            [["1_1", "Stop One"], ["1_1?bad", "Stop Bad"]],
+        )
+        trips_path = self._write_csv(
+            "trips.txt",
+            ["trip_id", "route_id"],
+            [["LI_100", "route1"]],
+        )
+        stop_times_path = self._write_csv(
+            "stop_times.txt",
+            ["stop_id", "trip_id"],
+            [["1_1", "LI_100"]],
+        )
+        agency_path = self._write_csv(
+            "agency.txt",
+            ["agency_id", "agency_name"],
+            [["LI", "LIRR"]],
+        )
+
+        with patch("updater.write_event") as mock_write:
+            updater.check_id_allowlist(
+                stops_path=stops_path,
+                trips_path=trips_path,
+                stop_times_path=stop_times_path,
+                agency_path=agency_path,
+            )
+
+        mock_write.assert_called_once()
+        event = mock_write.call_args[0][0]
+        self.assertEqual(event["event"], "id_allowlist")
+        self.assertIn("stops.txt", event["non_matching_ids"])
+        self.assertEqual(event["non_matching_ids"]["stops.txt"], ["1_1?bad"])
+        self.assertNotIn("trips.txt", event["non_matching_ids"])
+        self.assertNotIn("stop_times.txt", event["non_matching_ids"])
+        self.assertNotIn("agency.txt", event["non_matching_ids"])
+
+    def test_all_valid_ids_empty_non_matching(self):
+        """Test 14: all IDs valid — writes event with empty non_matching_ids."""
+        stops_path = self._write_csv(
+            "stops.txt",
+            ["stop_id", "stop_name"],
+            [["1_1", "Stop One"]],
+        )
+        trips_path = self._write_csv(
+            "trips.txt",
+            ["trip_id", "route_id"],
+            [["LI_100", "route1"]],
+        )
+        stop_times_path = self._write_csv(
+            "stop_times.txt",
+            ["stop_id", "trip_id"],
+            [["1_1", "LI_100"]],
+        )
+        agency_path = self._write_csv(
+            "agency.txt",
+            ["agency_id", "agency_name"],
+            [["LI", "LIRR"]],
+        )
+
+        with patch("updater.write_event") as mock_write:
+            updater.check_id_allowlist(
+                stops_path=stops_path,
+                trips_path=trips_path,
+                stop_times_path=stop_times_path,
+                agency_path=agency_path,
+            )
+
+        mock_write.assert_called_once()
+        event = mock_write.call_args[0][0]
+        self.assertEqual(event["event"], "id_allowlist")
+        self.assertEqual(event["non_matching_ids"], {})
+        self.assertIn("total_checked", event)
+
+    def test_missing_agency_file_logs_warning_no_event(self):
+        """Test 15: missing agency.txt — logs warning, writes no event."""
+        stops_path = self._write_csv(
+            "stops.txt",
+            ["stop_id", "stop_name"],
+            [["1_1", "Stop One"]],
+        )
+        trips_path = self._write_csv(
+            "trips.txt",
+            ["trip_id", "route_id"],
+            [["LI_100", "route1"]],
+        )
+        stop_times_path = self._write_csv(
+            "stop_times.txt",
+            ["stop_id", "trip_id"],
+            [["1_1", "LI_100"]],
+        )
+        agency_path = os.path.join(self.tmpdir, "does-not-exist.txt")
+
+        with patch("updater.write_event") as mock_write, \
+             self.assertLogs("updater", level="WARNING"):
+            updater.check_id_allowlist(
+                stops_path=stops_path,
+                trips_path=trips_path,
+                stop_times_path=stop_times_path,
+                agency_path=agency_path,
+            )
+
+        mock_write.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()
