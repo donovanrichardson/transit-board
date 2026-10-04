@@ -84,6 +84,8 @@ public class ScheduleApiHandler implements HttpHandler {
             ScheduleResponse response = buildResponse(stopId, scheduleDate);
             String json = objectMapper.writeValueAsString(response);
             sendResponse(exchange, 200, json);
+        } catch (IllegalArgumentException e) {
+            sendError(exchange, 400, "Invalid stop ID");
         } catch (ObaClient.ObaNotFoundException e) {
             sendError(exchange, 404, "Stop not found");
         } catch (ObaClient.ObaClientException e) {

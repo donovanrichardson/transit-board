@@ -37,38 +37,50 @@ public class ObaClient {
     }
 
     public ObaResponse fetchSchedule(String stopId, LocalDate date) {
-        String encodedStopId = stopId.replace(" ", "%20");
-        String url = baseUrl + "/api/where/schedule-for-stop/" + encodedStopId + ".json"
-                + "?key=" + apiKey + "&date=" + DATE_FMT.format(date);
+        String url = builder()
+                .path("api").path("where").path("schedule-for-stop").path(stopId)
+                .query("date", DATE_FMT.format(date))
+                .build();
         return fetchAs(url, ObaResponse.class);
     }
 
     public ObaStopResponse fetchStop(String stopId) {
-        String encodedStopId = stopId.replace(" ", "%20");
-        String url = baseUrl + "/api/where/stop/" + encodedStopId + ".json?key=" + apiKey;
+        String url = builder()
+                .path("api").path("where").path("stop").path(stopId)
+                .build();
         return fetchAs(url, ObaStopResponse.class);
     }
 
     public ObaTripResponse fetchTrip(String tripId) {
-        String encodedTripId = tripId.replace(" ", "%20");
-        String url = baseUrl + "/api/where/trip/" + encodedTripId + ".json?key=" + apiKey;
+        String url = builder()
+                .path("api").path("where").path("trip").path(tripId)
+                .build();
         return fetchAs(url, ObaTripResponse.class);
     }
 
     public ObaStopsForAgencyResponse fetchStopsForAgency(String agencyId) {
-        String url = baseUrl + "/api/where/stops-for-agency/" + agencyId + ".json?key=" + apiKey;
+        String url = builder()
+                .path("api").path("where").path("stops-for-agency").path(agencyId)
+                .build();
         return fetchAs(url, ObaStopsForAgencyResponse.class);
     }
 
     public ObaTripScheduleResponse fetchTripSchedule(String tripId) {
-        String encodedTripId = tripId.replace(" ", "%20");
-        String url = baseUrl + "/api/where/trip-details/" + encodedTripId + ".json?key=" + apiKey;
+        String url = builder()
+                .path("api").path("where").path("trip-details").path(tripId)
+                .build();
         return fetchAs(url, ObaTripScheduleResponse.class);
     }
 
     public ObaAgencyResponse fetchAgency(String agencyId) {
-        String url = baseUrl + "/api/where/agency/" + agencyId + ".json?key=" + apiKey;
+        String url = builder()
+                .path("api").path("where").path("agency").path(agencyId)
+                .build();
         return fetchAs(url, ObaAgencyResponse.class);
+    }
+
+    private ObaUrlBuilder builder() {
+        return new ObaUrlBuilder(baseUrl, apiKey);
     }
 
     private <T> T fetchAs(String url, Class<T> type) {

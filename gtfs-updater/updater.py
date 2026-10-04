@@ -3,6 +3,7 @@ import hashlib
 import json
 import logging
 import os
+import re
 import shutil
 import socket
 import tempfile
@@ -47,6 +48,11 @@ HEADSIGN_ABBREVIATIONS_PATH = os.environ.get(
     "HEADSIGN_ABBREVIATIONS_PATH", "/config/headsign-abbreviations.json"
 )
 TRIPS_PATH = "/bundle/gtfs-out/trips.txt"
+GTFS_OUT_STOPS_PATH = "/bundle/gtfs-out/stops.txt"
+GTFS_OUT_STOP_TIMES_PATH = "/bundle/gtfs-out/stop_times.txt"
+GTFS_OUT_AGENCY_PATH = "/bundle/gtfs-out/agency.txt"
+
+ID_ALLOWLIST_RE = re.compile(r"^[A-Za-z0-9_.:-]+$")
 
 
 def write_event(event: dict, log_path: str | None = None) -> None:
@@ -106,6 +112,62 @@ def check_headsign_coverage(
         "missing_headsigns": missing,
         "total_gtfs_headsigns": len(gtfs_headsigns),
         "total_mapped": len(known_headsigns),
+    })
+
+
+def check_id_allowlist(
+    stops_path: str | None = None,
+    trips_path: str | None = None,
+    stop_times_path: str | None = None,
+    agency_path: str | None = None,
+) -> None:
+    sp = stops_path if stops_path is not None else GTFS_OUT_STOPS_PATH
+    tp = trips_path if trips_path is not None else TRIPS_PATH
+    stp = stop_times_path if stop_times_path is not None else GTFS_OUT_STOP_TIMES_PATH
+    ap = agency_path if agency_path is not None else GTFS_OUT_AGENCY_PATH
+
+    file_configs = [
+        (sp, "stops.txt", "stop_id"),
+        (tp, "trips.txt", "trip_id"),
+        (stp, "stop_times.txt", "stop_id"),
+        (ap, "agency.txt", "agency_id"),
+    ]
+
+    non_matching: dict[str, list[str]] = {}
+    total_checked = 0
+
+    for path, filename, id_col in file_configs:
+        try:
+            with open(path, newline="") as f:
+                reader = csv.DictReader(f)
+                if id_col not in (reader.fieldnames or []):
+                    logger.warning(
+                        "%s has no %s column: %s", filename, id_col, path
+                    )
+                    return
+                failing: list[str] = []
+                seen: set[str] = set()
+                for row in reader:
+                    val = row[id_col]
+                    if val:
+                        total_checked += 1
+                        if not ID_ALLOWLIST_RE.match(val) and val not in seen:
+                            failing.append(val)
+                            seen.add(val)
+                if failing:
+                    non_matching[filename] = sorted(failing)
+        except FileNotFoundError:
+            logger.warning("File not found: %s", path)
+            return
+        except OSError as exc:
+            logger.warning("Failed to read %s: %s", path, exc)
+            return
+
+    write_event({
+        "ts": _now_ts(),
+        "event": "id_allowlist",
+        "non_matching_ids": non_matching,
+        "total_checked": total_checked,
     })
 
 
@@ -342,6 +404,7 @@ def run_update_check(conn: pymysql.Connection, feed_url: str) -> None:
                 "sha256": new_sha,
             })
             check_headsign_coverage()
+            check_id_allowlist()
             cleanup_marker_files()
             logger.info("GTFS update complete")
         else:
