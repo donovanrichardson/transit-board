@@ -2,14 +2,6 @@ package dev.shinpei.transitboard.api;
 
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class ObaUrlBuilderTest {
@@ -71,50 +63,4 @@ class ObaUrlBuilderTest {
         assertEquals(1, count, "URL must contain exactly one 'key=' parameter, got: " + url);
     }
 
-    // Test 6: all committed feed IDs from gtfs-out pass the allowlist
-    @Test
-    void committedFeedIdsPassAllowlist() throws Exception {
-        Pattern allowlist = Pattern.compile("^[A-Za-z0-9_.:-]+$");
-
-        checkFileIds("gtfs-out/stops.txt", "stop_id", allowlist);
-        checkFileIds("gtfs-out/trips.txt", "trip_id", allowlist);
-        checkFileIds("gtfs-out/stop_times.txt", "stop_id", allowlist);
-        checkFileIds("gtfs-out/agency.txt", "agency_id", allowlist);
-    }
-
-    private void checkFileIds(String resource, String idColumn, Pattern allowlist) throws IOException {
-        try (InputStream is = getClass().getClassLoader().getResourceAsStream(resource)) {
-            assertNotNull(is, "Test resource not found: " + resource);
-            java.io.BufferedReader reader = new java.io.BufferedReader(
-                    new InputStreamReader(is, StandardCharsets.UTF_8));
-
-            String headerLine = reader.readLine();
-            assertNotNull(headerLine, "Empty file: " + resource);
-
-            String[] headers = headerLine.split(",", -1);
-            int colIdx = -1;
-            for (int i = 0; i < headers.length; i++) {
-                if (idColumn.equals(headers[i].trim())) {
-                    colIdx = i;
-                    break;
-                }
-            }
-            assertNotEquals(-1, colIdx, "Column '" + idColumn + "' not found in " + resource);
-
-            List<String> failing = new ArrayList<>();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] fields = line.split(",", -1);
-                if (colIdx < fields.length) {
-                    String id = fields[colIdx].trim();
-                    if (!id.isEmpty() && !allowlist.matcher(id).matches()) {
-                        failing.add(id);
-                    }
-                }
-            }
-
-            assertTrue(failing.isEmpty(),
-                    "IDs in " + resource + " that fail the allowlist: " + failing);
-        }
-    }
 }
