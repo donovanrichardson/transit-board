@@ -40,7 +40,7 @@ Requests to `http://localhost:5173` from the server keep working (the README Qui
 - Production with the override: Caddy uses the Docker network, not the host port; no effect on the TLS path.
 - IPv6: `127.0.0.1:5173:80` binds IPv4 loopback only, the same as the existing `oba_app` pattern; no new gap.
 - `cli` and `oba_app_base` use Compose `profiles` and publish no ports.
-- Rollout: per `README.md` (the "After any rebuild" note, near line 128), recreate with `docker compose up -d frontend`, then re-run the `OBA_API_KEY=<key> docker compose up -d transit-board-api` step and `docker restart transit-board-frontend-1`, because cascade restarts wipe the injected key.
+- Rollout: per `README.md` (the "After any rebuild" note, near line 128), recreate with `docker compose up -d frontend`, then re-run the `docker compose up -d transit-board-api` step with the OBA API key injected from the environment, and `docker restart transit-board-frontend-1`, because cascade restarts wipe the injected key.
 
 ## Acceptance criteria
 Static / unit-testable (implementer, red-green):
