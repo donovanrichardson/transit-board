@@ -55,10 +55,12 @@ A request now logs method, path and protocol only (for example `GET /api/where/a
 - `transit-board/tests/test_oba_app_access_log_pattern.py`: reads `oba-app/Dockerfile` as text and asserts (1) `server.xml` and `%m %U %H` appear in the same `RUN` instruction, and (2) a build-failing guard (for example `grep -q ... || exit 1`) is present with that step.
 - Red first against the current Dockerfile (no such step, must fail), then green after the `RUN` step is added.
 
+## Sequencing (decided 2026-10-11)
+This fix lands in the same `oba_app` rebuild as the OBA API key rotation, so the new key is never written to an access log. Order: implement and merge this change; run the key-sync script to copy the new key from the password store into the env file; then recreate `oba_app` and `transit-board-api`, restart `gtfs_updater` and `frontend`; then run the post-deploy verification.
+
 ## Files that will change
 - `transit-board/oba-app/Dockerfile`
 - `transit-board/tests/test_oba_app_access_log_pattern.py` (new)
 
 ## Open questions
-- Land this in the same `oba_app` rebuild as the key rotation (recommended, so the new key is never logged), or separately?
 - File a follow-up issue to check the other leak surfaces listed under out of scope.
