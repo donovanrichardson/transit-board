@@ -13,7 +13,7 @@ The `oba_app` container's Tomcat access-log valve records the full request line,
 ### Out of scope
 - Rotating the OBA API key (separate step of #7, in progress).
 - Other places the key may leak: the `ObaClient` and `ObaUrlBuilder` classes in transit-board-api (exception or debug logging), frontend nginx access logs, `gtfs_updater` logs. To be checked in a separate follow-up.
-- A retention limit (`maxDays`) on the valve. Open question below.
+- Any retention limit or size-based rollover on the access logs. Decided against by the user on 2026-10-11: this change only stops the query string being written.
 - Purging existing access logs. They live in the container's writable layer and are discarded when `oba_app` is recreated.
 
 ## Behavior
@@ -60,6 +60,5 @@ A request now logs method, path and protocol only (for example `GET /api/where/a
 - `transit-board/tests/test_oba_app_access_log_pattern.py` (new)
 
 ## Open questions
-- Add a `maxDays` retention attribute to the valve as defense in depth? Not decided here.
 - Land this in the same `oba_app` rebuild as the key rotation (recommended, so the new key is never logged), or separately?
 - File a follow-up issue to check the other leak surfaces listed under out of scope.
