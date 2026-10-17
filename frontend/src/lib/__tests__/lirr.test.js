@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isLirr, CITY_TERMINALS, HEADSIGN_ABBREVIATIONS } from '../lirr.js';
+import { isLirr, CITY_TERMINALS, HEADSIGN_ABBREVIATIONS, getHeadsignAbbreviation } from '../lirr.js';
 
 describe('lirr.isLirr', () => {
   it('returns true for LI_ prefixed stop id', () => {
@@ -95,6 +95,40 @@ describe('lirr.HEADSIGN_ABBREVIATIONS', () => {
       expect(HEADSIGN_ABBREVIATIONS[headsign], headsign).toBeDefined();
     }
   });
+
+describe('lirr.getHeadsignAbbreviation', () => {
+  it('resolves Great Neck (Bus) to GNK via base fallback', () => {
+    expect(getHeadsignAbbreviation('Great Neck (Bus)')).toBe('GNK');
+  });
+
+  it('resolves Port Washington (Bus) to PWS via base fallback', () => {
+    expect(getHeadsignAbbreviation('Port Washington (Bus)')).toBe('PWS');
+  });
+
+  it('resolves West Hempstead (Bus) to WHD via base fallback', () => {
+    expect(getHeadsignAbbreviation('West Hempstead (Bus)')).toBe('WHD');
+  });
+
+  it('prefers explicit entry over fallback for Babylon (Bus)', () => {
+    expect(getHeadsignAbbreviation('Babylon (Bus)')).toBe('BAB');
+  });
+
+  it('resolves Valley Stream (Bus) to VSM via the new base entry', () => {
+    expect(getHeadsignAbbreviation('Valley Stream (Bus)')).toBe('VSM');
+  });
+
+  it('returns undefined for a (Bus) headsign whose base has no entry', () => {
+    expect(getHeadsignAbbreviation('Totally Unknown Place (Bus)')).toBeUndefined();
+  });
+
+  it('returns undefined for a headsign with no suffix and no entry', () => {
+    expect(getHeadsignAbbreviation('Totally Unknown Place')).toBeUndefined();
+  });
+
+  it('returns the direct value for a plain rail headsign', () => {
+    expect(getHeadsignAbbreviation('Great Neck')).toBe('GNK');
+  });
+});
 
   it('every (Bus) headsign value matches its base station value when base exists', () => {
     for (const key of Object.keys(HEADSIGN_ABBREVIATIONS)) {

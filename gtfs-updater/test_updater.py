@@ -807,6 +807,79 @@ class TestCheckHeadsignCoverage(unittest.TestCase):
         mock_write.assert_not_called()
 
 
+class TestCheckHeadsignCoverageBusFallback(unittest.TestCase):
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir)
+
+    def _write_json(self, data):
+        path = os.path.join(self.tmpdir, "headsign-abbreviations.json")
+        with open(path, "w") as f:
+            json.dump(data, f)
+        return path
+
+    def _write_trips(self, headsigns):
+        path = os.path.join(self.tmpdir, "trips.txt")
+        with open(path, "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(["route_id", "service_id", "trip_id", "trip_headsign"])
+            for h in headsigns:
+                writer.writerow(["R1", "S1", "T1", h])
+        return path
+
+    def test_check_headsign_coverage_bus_headsign_resolves_via_base_fallback(self):
+        json_path = self._write_json({"Great Neck": "GNK"})
+        trips_path = self._write_trips(["Great Neck (Bus)"])
+        with patch("updater.write_event") as mock_write:
+            updater.check_headsign_coverage(json_path=json_path, trips_path=trips_path)
+        event = mock_write.call_args[0][0]
+        self.assertEqual(event["missing_headsigns"], [])
+        self.assertEqual(event["total_gtfs_headsigns"], 1)
+
+    def test_check_headsign_coverage_bus_headsign_without_base_still_missing(self):
+        json_path = self._write_json({"Other": "OTH"})
+        trips_path = self._write_trips(["Foo (Bus)"])
+        with patch("updater.write_event") as mock_write:
+            updater.check_headsign_coverage(json_path=json_path, trips_path=trips_path)
+        event = mock_write.call_args[0][0]
+        self.assertEqual(event["missing_headsigns"], ["Foo (Bus)"])
+
+    def test_check_headsign_coverage_real_json_covers_reported_bus_headsigns(self):
+        # Load the committed abbreviations JSON from the frontend
+        real_json_path = os.path.join(
+            os.path.dirname(__file__),
+            "..", "frontend", "src", "lib", "headsign-abbreviations.json",
+        )
+        trips_path = self._write_trips([
+            "Great Neck (Bus)",
+            "Port Washington (Bus)",
+            "Valley Stream (Bus)",
+            "West Hempstead (Bus)",
+        ])
+        with patch("updater.write_event") as mock_write:
+            updater.check_headsign_coverage(json_path=real_json_path, trips_path=trips_path)
+        event = mock_write.call_args[0][0]
+        self.assertEqual(event["missing_headsigns"], [])
+
+    def test_check_headsign_coverage_explicit_bus_entry_still_satisfies_even_if_base_missing(self):
+        json_path = self._write_json({"Foo (Bus)": "FOO"})
+        trips_path = self._write_trips(["Foo (Bus)"])
+        with patch("updater.write_event") as mock_write:
+            updater.check_headsign_coverage(json_path=json_path, trips_path=trips_path)
+        event = mock_write.call_args[0][0]
+        self.assertEqual(event["missing_headsigns"], [])
+
+    def test_check_headsign_coverage_non_bus_headsign_unaffected(self):
+        json_path = self._write_json({"Known": "KNW"})
+        trips_path = self._write_trips(["Unknown"])
+        with patch("updater.write_event") as mock_write:
+            updater.check_headsign_coverage(json_path=json_path, trips_path=trips_path)
+        event = mock_write.call_args[0][0]
+        self.assertEqual(event["missing_headsigns"], ["Unknown"])
+
+
 class TestCheckIdAllowlist(unittest.TestCase):
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()

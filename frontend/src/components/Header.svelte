@@ -1,5 +1,5 @@
 <script>
-  import { CITY_TERMINALS, HEADSIGN_ABBREVIATIONS } from '../lib/lirr.js';
+  import { CITY_TERMINALS, getHeadsignAbbreviation } from '../lib/lirr.js';
   import { jaStopName, jaHeadsign } from '../lib/locale.js';
   import { t } from '../lib/i18n.js';
 
@@ -77,8 +77,8 @@
 
   $: hasDirection = !isLirrMode && stop && stop.direction;
   function effectiveAbbr(headsign) {
-    if (headsignAbbrevVisibility === null) return HEADSIGN_ABBREVIATIONS[headsign] || null;
-    return headsignAbbrevVisibility[headsign] ? HEADSIGN_ABBREVIATIONS[headsign] : null;
+    if (headsignAbbrevVisibility === null) return getHeadsignAbbreviation(headsign) || null;
+    return headsignAbbrevVisibility[headsign] ? getHeadsignAbbreviation(headsign) : null;
   }
 
   $: visibleHeadsigns = (() => {
