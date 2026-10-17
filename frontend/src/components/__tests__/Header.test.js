@@ -101,12 +101,17 @@ describe('Header.pills.label', () => {
 
 describe('Header.pills.abbreviationAbovePill', () => {
   it('each pill entry has a .pill-abbreviation above it; for Babylon it shows "BAB"', () => {
+    const deps = [
+      { headsign: 'Babylon', routeId: 'LI_1', routeColor: '009B3A', routeTextColor: 'FFFFFF' },
+      { headsign: 'Penn Station', routeId: 'LI_1', routeColor: '009B3A', routeTextColor: 'FFFFFF' },
+    ];
     const { container } = render(Header, {
-      props: { stop: stopNonLirr, departures: departuresBabylon, isLirrMode: false },
+      props: { stop: stopNonLirr, departures: deps, isLirrMode: false },
     });
-    const abbr = container.querySelector('.pill-abbreviation');
-    expect(abbr).not.toBeNull();
-    expect(abbr.textContent.trim()).toBe('BAB');
+    const abbrs = container.querySelectorAll('.pill-abbreviation');
+    expect(abbrs.length).toBeGreaterThan(0);
+    const texts = Array.from(abbrs).map((el) => el.textContent.trim());
+    expect(texts).toContain('BAB');
   });
 });
 
@@ -147,18 +152,20 @@ describe('pills.abbrevVisibility.suppressedShowsUnlabeled', () => {
   it('renders "Unlabeled" for Penn Station when headsignAbbrevVisibility marks it false', () => {
     const deps = [
       { headsign: 'Penn Station', routeId: 'LI_1', routeColor: '009B3A', routeTextColor: 'FFFFFF' },
+      { headsign: 'Babylon', routeId: 'LI_2', routeColor: '009B3A', routeTextColor: 'FFFFFF' },
     ];
     const { container } = render(Header, {
       props: {
         stop: stopNonLirr,
         departures: deps,
         isLirrMode: false,
-        headsignAbbrevVisibility: { 'Penn Station': false },
+        headsignAbbrevVisibility: { 'Penn Station': false, 'Babylon': true },
       },
     });
-    const abbr = container.querySelector('.pill-abbreviation');
-    expect(abbr).not.toBeNull();
-    expect(abbr.textContent.trim()).toBe('Unlabeled');
+    const abbrs = container.querySelectorAll('.pill-abbreviation');
+    expect(abbrs.length).toBeGreaterThan(0);
+    const texts = Array.from(abbrs).map((el) => el.textContent.trim());
+    expect(texts).toContain('Unlabeled');
   });
 });
 
@@ -166,18 +173,20 @@ describe('pills.abbrevVisibility.visibleShowsAbbr', () => {
   it('renders "BAB" for Babylon when headsignAbbrevVisibility marks it true', () => {
     const deps = [
       { headsign: 'Babylon', routeId: 'LI_1', routeColor: '009B3A', routeTextColor: 'FFFFFF' },
+      { headsign: 'Penn Station', routeId: 'LI_2', routeColor: '009B3A', routeTextColor: 'FFFFFF' },
     ];
     const { container } = render(Header, {
       props: {
         stop: stopNonLirr,
         departures: deps,
         isLirrMode: false,
-        headsignAbbrevVisibility: { 'Babylon': true },
+        headsignAbbrevVisibility: { 'Babylon': true, 'Penn Station': true },
       },
     });
-    const abbr = container.querySelector('.pill-abbreviation');
-    expect(abbr).not.toBeNull();
-    expect(abbr.textContent.trim()).toBe('BAB');
+    const abbrs = container.querySelectorAll('.pill-abbreviation');
+    expect(abbrs.length).toBeGreaterThan(0);
+    const texts = Array.from(abbrs).map((el) => el.textContent.trim());
+    expect(texts).toContain('BAB');
   });
 });
 

@@ -159,7 +159,9 @@
         {@const colors = headsignColor(headsign)}
         {@const abbr = effectiveAbbr(headsign) || null}
         <div class="pill-entry">
-          <div class="pill-abbreviation">{abbr ?? 'Unlabeled'}</div>
+          {#if visibleHeadsigns.length > 1}
+            <div class="pill-abbreviation">{abbr ?? 'Unlabeled'}</div>
+          {/if}
           <span
             class="headsign-pill"
             style="background-color: {colors.bg}; color: {colors.text};"
