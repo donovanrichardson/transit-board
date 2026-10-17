@@ -181,6 +181,21 @@ describe('pills.abbrevVisibility.visibleShowsAbbr', () => {
   });
 });
 
+describe('Header.pills.busHeadsignFallback', () => {
+  it('pill abbreviation shows GNK for headsign "Great Neck (Bus)" with no explicit JSON entry', () => {
+    const deps = [
+      { headsign: 'Great Neck (Bus)', routeId: 'LI_1', routeColor: '009B3A', routeTextColor: 'FFFFFF' },
+      { headsign: 'Penn Station', routeId: 'LI_1', routeColor: '009B3A', routeTextColor: 'FFFFFF' },
+    ];
+    const { container } = render(Header, {
+      props: { stop: stopNonLirr, departures: deps, isLirrMode: false },
+    });
+    const abbrs = container.querySelectorAll('.pill-abbreviation');
+    const texts = Array.from(abbrs).map((el) => el.textContent.trim());
+    expect(texts).toContain('GNK');
+  });
+});
+
 describe('pills.abbrevVisibility.missingKeyTreatedAsUnlabeled', () => {
   it('renders "Unlabeled" when headsignAbbrevVisibility is empty for any headsign', () => {
     const deps = [
