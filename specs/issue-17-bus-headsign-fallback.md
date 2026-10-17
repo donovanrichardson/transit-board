@@ -3,19 +3,19 @@
 Tracker: transit-board#17
 
 ## Goal
-A headsign of the form `"<Base> (Bus)"` that has no explicit entry in `frontend/src/lib/headsign-abbreviations.json` should resolve to the abbreviation of `"<Base>"` (its rail counterpart) if that entry exists, instead of being treated as unlabeled. This closes a gap where e.g. `"Great Neck (Bus)"`, `"Port Washington (Bus)"`, and `"West Hempstead (Bus)"` render as "Unlabeled" in the UI and are flagged as missing by the gtfs-updater coverage check, purely because no one added a redundant `"X (Bus)": "<same code as X>"` entry for them.
+A headsign of the form `"<Base> (Bus)"` that has no explicit entry in `headsign-abbreviations.json` (frontend lib) should resolve to the abbreviation of `"<Base>"` (its rail counterpart) if that entry exists, instead of being treated as unlabeled. This closes a gap where e.g. `"Great Neck (Bus)"`, `"Port Washington (Bus)"`, and `"West Hempstead (Bus)"` render as "Unlabeled" in the UI and are flagged as missing by the gtfs-updater coverage check, purely because no one added a redundant `"X (Bus)": "<same code as X>"` entry for them.
 
 ## Scope
 
 ### In scope
-- `frontend/src/lib/lirr.js` — add a new exported lookup function `getHeadsignAbbreviation(headsign)` that implements: explicit entry in the JSON wins; otherwise if the headsign matches `^(.*) \(Bus\)$` and the capture group has an entry, return that; otherwise return `undefined` (unchanged "not found" behavior). `HEADSIGN_ABBREVIATIONS` (the raw imported JSON object) stays exported as-is, but is no longer read directly by the two UI consumers.
-- `frontend/src/components/Header.svelte` — `effectiveAbbr()` uses the new lookup function instead of `HEADSIGN_ABBREVIATIONS[headsign]` directly, so the pill abbreviation and sort order pick up the fallback.
-- `frontend/src/components/Timetable.svelte` — the `abbreviation={...}` expression passed to `MinuteCell` uses the new lookup function instead of `HEADSIGN_ABBREVIATIONS[dep.headsign] || ''`.
+- `lirr.js` (frontend lib) — add a new exported lookup function `getHeadsignAbbreviation(headsign)` that implements: explicit entry in the JSON wins; otherwise if the headsign matches `^(.*) \(Bus\)$` and the capture group has an entry, return that; otherwise return `undefined` (unchanged "not found" behavior). `HEADSIGN_ABBREVIATIONS` (the raw imported JSON object) stays exported as-is, but is no longer read directly by the two UI consumers.
+- `Header.svelte` (frontend components) — `effectiveAbbr()` uses the new lookup function instead of `HEADSIGN_ABBREVIATIONS[headsign]` directly, so the pill abbreviation and sort order pick up the fallback.
+- `Timetable.svelte` (frontend components) — the `abbreviation={...}` expression passed to `MinuteCell` uses the new lookup function instead of `HEADSIGN_ABBREVIATIONS[dep.headsign] || ''`.
 - `gtfs-updater/updater.py` — `check_headsign_coverage()` treats a GTFS headsign as "known" if it has an explicit entry in the JSON *or* it matches `^(.*) \(Bus\)$` and its capture group has an entry. Only headsigns satisfying neither are reported in `missing_headsigns`. `total_mapped` keeps its meaning (literal count of keys in the JSON); only the missing-set calculation changes.
-- `frontend/src/lib/headsign-abbreviations.json` — no required change under this spec (see Open questions).
+- `headsign-abbreviations.json` (frontend lib) — no required change under this spec (see Open questions).
 
 ### Out of scope
-- Any change to `computeHeadsignAbbreviationVisibility` / `computeRouteIconVisibility` in `frontend/src/lib/timetable.js` — these only count occurrences and are agnostic to how an abbreviation value is produced.
+- Any change to `computeHeadsignAbbreviationVisibility` / `computeRouteIconVisibility` in `timetable.js` (frontend lib) — these only count occurrences and are agnostic to how an abbreviation value is produced.
 - Any change to `check_id_allowlist` or other coverage-adjacent checks in `gtfs-updater/updater.py`.
 - Adding a `"Valley Stream"` rail entry, or deleting redundant `(Bus)` entries — deferred (see Open questions).
 - Any regex beyond `^(.*) \(Bus\)$` (no other suffixes, repeated suffixes, or case-insensitivity).
@@ -41,7 +41,7 @@ A headsign of the form `"<Base> (Bus)"` that has no explicit entry in `frontend/
 
 ### Frontend lookup function signature
 ```js
-// frontend/src/lib/lirr.js
+// lirr.js (frontend lib)
 export function getHeadsignAbbreviation(headsign) {
   // returns the abbreviation string, or undefined if unresolved
 }
@@ -72,12 +72,12 @@ In `check_headsign_coverage()`, replace the direct set difference `gtfs_headsign
 - [ ] Timetable minute-cell abbreviation for a departure with headsign `'Great Neck (Bus)'` renders `GNK` instead of an empty string.
 - [ ] `check_headsign_coverage()` with GTFS headsigns `'Great Neck (Bus)'`, `'Port Washington (Bus)'`, `'West Hempstead (Bus)'` and a JSON containing only their rail bases produces no missing entries for those three.
 - [ ] `check_headsign_coverage()` with GTFS headsign `'Valley Stream (Bus)'` and no `"Valley Stream"` entry still reports it missing.
-- [ ] All existing tests in `frontend/src/lib/__tests__/lirr.test.js`, `frontend/src/components/__tests__/Header.test.js`, and `gtfs-updater/test_updater.py` still pass with no existing assertion weakened.
+- [ ] All existing tests in `lirr.test.js` (frontend lib tests), `Header.test.js` (frontend component tests), and `gtfs-updater/test_updater.py` still pass with no existing assertion weakened.
 
 ## Tests to write
 
 ### Frontend (vitest)
-- `frontend/src/lib/__tests__/lirr.test.js`:
+- `lirr.test.js` (frontend lib tests):
   - resolves Great Neck (Bus) to GNK via base fallback
   - resolves Port Washington (Bus) to PWS via base fallback
   - resolves West Hempstead (Bus) to WHD via base fallback
@@ -85,7 +85,7 @@ In `check_headsign_coverage()`, replace the direct set difference `gtfs_headsign
   - returns undefined for Valley Stream (Bus) (no base entry)
   - returns undefined for a headsign with no suffix and no entry
   - returns the direct value for a plain rail headsign
-- `frontend/src/components/__tests__/Header.test.js`:
+- `Header.test.js` (frontend component tests):
   - pill abbreviation shows GNK for headsign "Great Neck (Bus)" with no explicit JSON entry
 
 ### gtfs-updater (unittest, extending `gtfs-updater/test_updater.py`)
@@ -95,11 +95,11 @@ In `check_headsign_coverage()`, replace the direct set difference `gtfs_headsign
 - `test_check_headsign_coverage_non_bus_headsign_unaffected`: a non-suffixed headsign with no entry is still reported missing.
 
 ## Files that will change
-- `frontend/src/lib/lirr.js`
-- `frontend/src/components/Header.svelte`
-- `frontend/src/components/Timetable.svelte`
-- `frontend/src/lib/__tests__/lirr.test.js`
-- `frontend/src/components/__tests__/Header.test.js`
+- `lirr.js` (frontend lib)
+- `Header.svelte` (frontend components)
+- `Timetable.svelte` (frontend components)
+- `lirr.test.js` (frontend lib tests)
+- `Header.test.js` (frontend component tests)
 - `gtfs-updater/updater.py`
 - `gtfs-updater/test_updater.py`
 
