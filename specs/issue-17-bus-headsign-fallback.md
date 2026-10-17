@@ -17,7 +17,7 @@ A headsign of the form `"<Base> (Bus)"` that has no explicit entry in `headsign-
 ### Out of scope
 - Any change to `computeHeadsignAbbreviationVisibility` / `computeRouteIconVisibility` in `timetable.js` (frontend lib) — these only count occurrences and are agnostic to how an abbreviation value is produced.
 - Any change to `check_id_allowlist` or other coverage-adjacent checks in `gtfs-updater/updater.py`.
-- Deleting redundant `(Bus)` entries — undecided (see Open questions).
+- Deleting the redundant `(Bus)` entries — they stay (decided 2026-10-17).
 - Any regex beyond `^(.*) \(Bus\)$` (no other suffixes, repeated suffixes, or case-insensitivity).
 - Localization (`jaHeadsign`) — unaffected.
 
@@ -110,4 +110,4 @@ In `check_headsign_coverage()`, replace the direct set difference `gtfs_headsign
 
 ## Open questions
 1. ~~Add a `"Valley Stream"` rail entry?~~ **Resolved 2026-10-17: yes, add `"Valley Stream": "VSM"`.**
-2. **Delete the now-redundant explicit `(Bus)` entries whose code equals the base code?** (Babylon, Central Islip, Greenport, Huntington, Montauk, Oyster Bay, Patchogue, Port Jefferson, Riverhead, Ronkonkoma, Smithtown, Southampton, Speonk.) `Glen Cove (Bus)`, `Greenvale (Bus)` and `Mineola (Bus)` have no rail base and must stay. Removal is pure cleanup with no behavioral effect; leaving them is harmless.
+2. ~~Delete the now-redundant explicit `(Bus)` entries?~~ **Resolved 2026-10-17: no, leave them in place.**
