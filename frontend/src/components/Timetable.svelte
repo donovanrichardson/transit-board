@@ -1,7 +1,7 @@
 <script>
   import MinuteCell from './MinuteCell.svelte';
   import { groupByHour, computeRowColor, computeRouteIconVisibility, computeHeadsignAbbreviationVisibility, filterDepartures, formatHourLabel } from '../lib/timetable.js';
-  import { HEADSIGN_ABBREVIATIONS, CITY_TERMINALS } from '../lib/lirr.js';
+  import { getHeadsignAbbreviation, CITY_TERMINALS } from '../lib/lirr.js';
   import { t } from '../lib/i18n.js';
 
   export let departures = [];
@@ -85,7 +85,7 @@
                   departure={dep}
                   showIcon={isLirrMode ? false : (iconVisibility[dep.routeId] || false)}
                   showAbbreviation={isLirrMode ? (headsignAbbrevVisibility[dep.headsign] || false) : false}
-                  abbreviation={isLirrMode ? (HEADSIGN_ABBREVIATIONS[dep.headsign] || '') : ''}
+                  abbreviation={isLirrMode ? (getHeadsignAbbreviation(dep.headsign) || '') : ''}
                   {isLirrMode}
                 />
               {/each}
