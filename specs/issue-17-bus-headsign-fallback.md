@@ -52,6 +52,9 @@ export function getHeadsignAbbreviation(headsign) {
 ### gtfs-updater coverage check
 In `check_headsign_coverage()`, replace the direct set difference `gtfs_headsigns - known_headsigns` with a check that, for each headsign in `gtfs_headsigns` not in `known_headsigns`, also checks whether it matches `^(.*) \(Bus\)$` with the capture group present in `known_headsigns`; only headsigns failing both go into `missing`. `total_gtfs_headsigns` and `total_mapped` keep their current definitions.
 
+### Header label rule (decided 2026-10-17)
+The Header shows the code label above each destination pill **only when two or more destinations are shown**. A board with only one destination has no label. This rule (added in the June 19 header revamp) must stay. Four existing Header tests were never updated for it and fail on main: `Header.pills.abbreviationAbovePill`, `pills.abbrevVisibility.suppressedShowsUnlabeled`, `pills.abbrevVisibility.visibleShowsAbbr`, `pills.abbrevVisibility.missingKeyTreatedAsUnlabeled`. Fix them by rendering two or more destinations in their fixtures, keeping their assertions about the label text. Add one test proving a single-destination board renders no label. The new Great Neck (Bus) Header test must use two or more destinations.
+
 ## Edge cases
 - Repeated suffix (theoretical `"X (Bus) (Bus)"`): the anchored greedy regex strips only the final suffix once; capture group `"X (Bus)"` would need its own entry. No recursive stripping. No such headsign exists today.
 - Empty or whitespace-only base: capture group matches no real key, falls through to unresolved.
@@ -74,6 +77,7 @@ In `check_headsign_coverage()`, replace the direct set difference `gtfs_headsign
 - [ ] `check_headsign_coverage()` with GTFS headsigns `'Great Neck (Bus)'`, `'Port Washington (Bus)'`, `'West Hempstead (Bus)'` and a JSON containing only their rail bases produces no missing entries for those three.
 - [ ] `check_headsign_coverage()` with a bus headsign whose base has no entry (e.g. `'Foo (Bus)'`) still reports it missing.
 - [ ] `check_headsign_coverage()` run against the real committed JSON with GTFS headsigns `'Great Neck (Bus)'`, `'Port Washington (Bus)'`, `'Valley Stream (Bus)'`, `'West Hempstead (Bus)'` reports no missing headsigns.
+- [ ] The Header shows no code label when only one destination is shown, and shows labels when two or more are shown.
 - [ ] All existing tests in `lirr.test.js` (frontend lib tests), `Header.test.js` (frontend component tests), and `gtfs-updater/test_updater.py` still pass with no existing assertion weakened.
 
 ## Tests to write
