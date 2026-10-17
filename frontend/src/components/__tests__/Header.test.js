@@ -200,6 +200,7 @@ describe('pills.abbrevVisibility.missingKeyTreatedAsUnlabeled', () => {
   it('renders "Unlabeled" when headsignAbbrevVisibility is empty for any headsign', () => {
     const deps = [
       { headsign: 'Penn Station', routeId: 'LI_1', routeColor: '009B3A', routeTextColor: 'FFFFFF' },
+      { headsign: 'Babylon', routeId: 'LI_2', routeColor: '009B3A', routeTextColor: 'FFFFFF' },
     ];
     const { container } = render(Header, {
       props: {
@@ -209,8 +210,21 @@ describe('pills.abbrevVisibility.missingKeyTreatedAsUnlabeled', () => {
         headsignAbbrevVisibility: {},
       },
     });
-    const abbr = container.querySelector('.pill-abbreviation');
-    expect(abbr).not.toBeNull();
-    expect(abbr.textContent.trim()).toBe('Unlabeled');
+    const abbrs = container.querySelectorAll('.pill-abbreviation');
+    expect(abbrs.length).toBeGreaterThan(0);
+    const texts = Array.from(abbrs).map((el) => el.textContent.trim());
+    expect(texts).toContain('Unlabeled');
+  });
+});
+
+describe('Header.pills.singleDestNoLabel', () => {
+  it('renders no .pill-abbreviation when only one destination is shown', () => {
+    const deps = [
+      { headsign: 'Babylon', routeId: 'LI_1', routeColor: '009B3A', routeTextColor: 'FFFFFF' },
+    ];
+    const { container } = render(Header, {
+      props: { stop: stopNonLirr, departures: deps, isLirrMode: false },
+    });
+    expect(container.querySelector('.pill-abbreviation')).toBeNull();
   });
 });
