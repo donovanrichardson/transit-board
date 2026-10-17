@@ -105,7 +105,14 @@ def check_headsign_coverage(
         logger.warning("Failed to read trips.txt %s: %s", tp, exc)
         return
 
-    missing = sorted(gtfs_headsigns - known_headsigns)
+    bus_suffix_re = re.compile(r"^(.*) \(Bus\)$")
+    missing = sorted(
+        h for h in gtfs_headsigns
+        if h not in known_headsigns
+        and not (
+            (m := bus_suffix_re.match(h)) and m.group(1) in known_headsigns
+        )
+    )
     write_event({
         "ts": _now_ts(),
         "event": "headsign_coverage",
